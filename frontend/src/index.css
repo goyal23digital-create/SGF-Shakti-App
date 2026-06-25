@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gray-50 text-gray-900;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.table-grid {
+  @apply w-full text-sm border-collapse;
+}
+.table-grid th {
+  @apply bg-gray-100 text-left px-3 py-2 font-semibold border border-gray-200 sticky top-0;
+}
+.table-grid td {
+  @apply px-3 py-1.5 border border-gray-200;
+}
+.table-grid tr:hover td {
+  @apply bg-orange-50;
+}
