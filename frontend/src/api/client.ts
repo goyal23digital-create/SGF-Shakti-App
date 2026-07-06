@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL ?? '';
-
-export const api = axios.create({ baseURL: `${API_URL}/api` });
+// In production (Vercel) requests go to /api on the same origin.
+// In local dev the Vite proxy forwards /api → localhost:3001.
+export const api = axios.create({ baseURL: '/api' });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
