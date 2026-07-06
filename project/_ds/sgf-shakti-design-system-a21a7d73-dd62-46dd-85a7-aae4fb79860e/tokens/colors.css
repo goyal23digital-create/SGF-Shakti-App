@@ -1,0 +1,138 @@
+/* SGF Shakti — Color tokens
+   Brand DNA: Shakti orange (energy / power) + Shakti blue (trust / durability).
+   Sampled from the master logo. Orange = action & highlight, Blue = structure & identity. */
+
+:root {
+  /* ---- Brand: Orange (Shakti energy) ---- */
+  --orange-50:  #FFF6E8;
+  --orange-100: #FFE8C2;
+  --orange-200: #FFD68C;
+  --orange-300: #FFC04D;
+  --orange-400: #FFAC20;
+  --orange-500: #F7941D; /* core orange */
+  --orange-600: #E0790C;
+  --orange-700: #B85F08;
+  --orange-800: #8E4A0C;
+  --orange-900: #5C300A;
+
+  /* ---- Brand: Blue (Shakti trust) ---- */
+  --blue-50:  #EAF3FF;
+  --blue-100: #CFE3FF;
+  --blue-200: #9FC6FF;
+  --blue-300: #5EA1FB;
+  --blue-400: #2C7DEE;
+  --blue-500: #0E63D6; /* bright blue */
+  --blue-600: #0A52B4;
+  --blue-700: #0A3F86;
+  --blue-800: #0A2F60;
+  --blue-900: #0B2142; /* deep navy */
+
+  /* ---- Neutrals: cool slate ---- */
+  --slate-0:   #FFFFFF;
+  --slate-50:  #F6F8FB;
+  --slate-100: #EDF1F6;
+  --slate-200: #DDE4EC;
+  --slate-300: #C3CEDA;
+  --slate-400: #9AA8B8;
+  --slate-500: #6B7A8C;
+  --slate-600: #4C5969;
+  --slate-700: #364150;
+  --slate-800: #222C3A;
+  --slate-900: #131B27;
+  --ink:       #0E1B2E; /* strongest text, near-navy */
+
+  /* ---- Semantic status ---- */
+  --green-50:  #E7F6EE;
+  --green-500: #1E9E5A;
+  --green-600: #168049;
+  --amber-50:  #FFF6E0;
+  --amber-500: #F5A524;
+  --amber-600: #C9821A;
+  --red-50:    #FDECEC;
+  --red-500:   #E5484D;
+  --red-600:   #C5363B;
+
+  /* ---- Premium warm neutrals (cream / sand) ---- */
+  --cream-50:  #FBF7EF;
+  --cream-100: #F4ECDC;
+  --sand-200:  #E8DCC4;
+  --sand-300:  #D8C7A6;
+
+  /* ---- Supporting accents (campaigns, infographics) ---- */
+  --teal-50:   #E2F4F2;
+  --teal-500:  #128A86;
+  --teal-600:  #0E6F6C;
+  --plum-50:   #F3E9F2;
+  --plum-500:  #6E2A6B;
+  --plum-600:  #581F55;
+
+  /* ---- Product colourways (real moulded-furniture finishes) ---- */
+  --cw-ivory:    #EFE6D2;
+  --cw-cream:    #F6EEDC;
+  --cw-marigold: #F4A81D;
+  --cw-cherry:   #C62828;
+  --cw-maroon:   #7A1F2B;
+  --cw-leaf:     #3E9B4F;
+  --cw-teal:     #128A86;
+  --cw-sky:      #2C7DEE;
+  --cw-walnut:   #6B4226;
+  --cw-charcoal: #2B2F36;
+  --cw-graphite: #8C949E;
+  --cw-white:    #F7F8FA;
+
+  /* ---- Brand gradients (orange top-left → blue bottom-right, per logo) ---- */
+  --grad-orange: linear-gradient(135deg, #FFBA1F 0%, #F2790A 100%); /* @kind color */
+  --grad-blue:   linear-gradient(135deg, #2C7DEE 0%, #0A3F86 100%); /* @kind color */
+  --grad-brand:  linear-gradient(135deg, #FFAC20 0%, #F7941D 38%, #0E63D6 70%, #0A2F60 100%); /* @kind color */
+  --grad-navy:   linear-gradient(160deg, #143A6E 0%, #0B2142 100%); /* @kind color */
+  --grad-teal:   linear-gradient(135deg, #2BB7B0 0%, #0E6F6C 100%); /* @kind color */
+  --grad-premium:linear-gradient(135deg, #FBF7EF 0%, #E8DCC4 100%); /* @kind color */
+
+  /* ================= SEMANTIC ALIASES ================= */
+  /* Surfaces */
+  --surface-page:    var(--slate-50);
+  --surface-card:    var(--slate-0);
+  --surface-raised:  var(--slate-0);
+  --surface-sunken:  var(--slate-100);
+  --surface-cream:   var(--cream-50);
+  --surface-inverse: var(--blue-900);
+  --surface-brand:   var(--blue-700);
+  --surface-accent:  var(--orange-500);
+
+  /* Text */
+  --text-strong:   var(--ink);
+  --text-body:     var(--slate-700);
+  --text-muted:    var(--slate-500);
+  --text-faint:    var(--slate-400);
+  --text-on-brand: #FFFFFF;
+  --text-on-accent:#FFFFFF;
+  --text-link:     var(--blue-600);
+
+  /* Borders */
+  --border-subtle: var(--slate-200);
+  --border-default:var(--slate-300);
+  --border-strong: var(--slate-400);
+  --border-brand:  var(--blue-500);
+
+  /* Brand roles */
+  --brand-primary:        var(--blue-700);
+  --brand-primary-bright: var(--blue-500);
+  --brand-accent:         var(--orange-500);
+  --brand-accent-strong:  var(--orange-600);
+
+  /* Interaction */
+  --focus-ring:   var(--blue-400);
+  --selection-bg: var(--blue-100);
+
+  /* Status semantic */
+  --status-success: var(--green-500);
+  --status-success-bg: var(--green-50);
+  --status-warning: var(--amber-500);
+  --status-warning-bg: var(--amber-50);
+  --status-danger:  var(--red-500);
+  --status-danger-bg: var(--red-50);
+  --status-info:    var(--blue-500);
+  --status-info-bg: var(--blue-50);
+}
+
+::selection { background: var(--selection-bg); }

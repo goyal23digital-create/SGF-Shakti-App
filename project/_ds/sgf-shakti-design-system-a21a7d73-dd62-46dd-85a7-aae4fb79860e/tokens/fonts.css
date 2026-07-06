@@ -1,0 +1,7 @@
+/* SGF Shakti — Fonts
+   Display: Bricolage Grotesque (modern editorial grotesque — characterful, premium headlines)
+   Body:    Hanken Grotesk (clean, modern, highly legible — UI + running text)
+   Condensed accents / labels: Saira Condensed (industrial uppercase labels & seals)
+   NOTE: loaded from Google Fonts CDN. For fully offline use, swap in self-hosted woff2 files. */
+
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Saira+Condensed:wght@500;600;700&display=swap');

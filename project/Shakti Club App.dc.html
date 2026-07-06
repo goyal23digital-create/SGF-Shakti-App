@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/radius.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/shadows.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/base.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="lucide-icon.js"></script>
+  <script src="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/_ds_bundle.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; }
+    body { background: #E7ECF3; }
+    [data-app-scroll]::-webkit-scrollbar { display: none; }
+    [data-app-scroll] { scrollbar-width: none; }
+    @keyframes sc-shimmer { 0% { transform: translateX(-120%) skewX(-18deg); } 100% { transform: translateX(340%) skewX(-18deg); } }
+    @keyframes sc-toast-in { 0% { transform: translateY(-16px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+    @keyframes sc-sheet-up { 0% { transform: translateY(100%); } 100% { transform: translateY(0); } }
+    @keyframes sc-fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
+    @keyframes sc-pop { 0% { transform: scale(0.4); opacity: 0; } 65% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes sc-coin { 0%, 100% { transform: translateY(0) rotate(-8deg); } 50% { transform: translateY(-5px) rotate(6deg); } }
+    @keyframes sc-scanline { 0% { top: 8%; } 50% { top: 88%; } 100% { top: 8%; } }
+    @keyframes sc-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(247, 148, 29, 0.45); } 60% { box-shadow: 0 0 0 12px rgba(247, 148, 29, 0); } }
+    @keyframes sc-confetti { 0% { transform: translateY(-10px) rotate(0deg); opacity: 1; } 100% { transform: translateY(340px) rotate(540deg); opacity: 0; } }
+    @keyframes sc-ring { 0% { transform: scale(0.9); opacity: 0.9; } 100% { transform: scale(1.7); opacity: 0; } }
+  </style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;gap:44px;flex-wrap:wrap;padding:44px 40px 64px;font-family:var(--font-body)">
+
+  <!-- ============ PHONE ============ -->
+  <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="428px,908px">
+    <div style="position:relative;height:100%;display:flex;flex-direction:column;background:var(--slate-50);font-family:var(--font-body);color:var(--text-strong)">
+
+      <!-- ======== LOGIN ======== -->
+      <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="Login" style="flex:1;display:flex;flex-direction:column;background:#fff;overflow-y:auto" data-app-scroll="true">
+          <div style="display:flex;justify-content:flex-end;gap:8px;padding:18px 18px 0">
+            <sc-for list="{{ langs }}" as="lg" hint-placeholder-count="3">
+              <div onClick="{{ lg.set }}" style="white-space:nowrap;padding:6px 13px;border-radius:999px;font-size:12.5px;font-weight:{{ lg.weight }};cursor:pointer;border:1px solid {{ lg.border }};background:{{ lg.bg }};color:{{ lg.color }}">{{ lg.label }}</div>
+            </sc-for>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 30px;text-align:center">
+            <img src="assets/logo-mark.png" alt="SGF Shakti" style="width:84px;height:84px;object-fit:contain;border-radius:22px;box-shadow:var(--shadow-md)">
+            <div style="font-family:var(--font-condensed);font-weight:700;letter-spacing:0.24em;text-transform:uppercase;font-size:13px;color:var(--brand-accent-strong);margin-top:20px">SGF Shakti Partner App</div>
+            <div style="font-family:var(--font-display);font-weight:800;font-size:40px;line-height:1.05;letter-spacing:-0.01em;margin-top:6px">Shakti Club</div>
+            <div style="font-size:14.5px;color:var(--text-muted);margin-top:10px;line-height:1.5">{{ t.earnLine }}</div>
+            <sc-if value="{{ notOtpStage }}" hint-placeholder-val="{{ false }}">
+              <div style="width:100%;margin-top:36px;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:10px;border:1px solid var(--slate-300);border-radius:999px;padding:14px 18px;background:#fff">
+                  <span style="font-weight:700;color:var(--text-body);font-size:15px">+91</span>
+                  <span style="width:1px;height:18px;background:var(--slate-200)"></span>
+                  <span style="font-size:15px;color:var(--text-strong);font-weight:600;letter-spacing:0.03em">98140 22331</span>
+                </div>
+                <div onClick="{{ getOtp }}" style-hover="filter:brightness(1.05)" style="background:var(--grad-orange);color:#fff;border-radius:999px;padding:15px;text-align:center;font-weight:700;font-size:15.5px;cursor:pointer;box-shadow:var(--shadow-accent)">Get OTP</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ otpStage }}" hint-placeholder-val="{{ false }}">
+              <div style="width:100%;margin-top:36px;display:flex;flex-direction:column;gap:14px;animation:sc-fade-in 0.4s ease">
+                <div style="font-size:13px;color:var(--text-muted)">OTP sent to +91 98140 22331</div>
+                <div style="display:flex;gap:10px;justify-content:center">
+                  <div style="width:52px;height:56px;border:1.5px solid var(--blue-500);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:22px">7</div>
+                  <div style="width:52px;height:56px;border:1.5px solid var(--blue-500);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:22px">3</div>
+                  <div style="width:52px;height:56px;border:1.5px solid var(--blue-500);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:22px">4</div>
+                  <div style="width:52px;height:56px;border:1.5px solid var(--blue-500);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:22px">1</div>
+                </div>
+                <div onClick="{{ verifyOtp }}" style-hover="filter:brightness(1.05)" style="background:var(--grad-orange);color:#fff;border-radius:999px;padding:15px;text-align:center;font-weight:700;font-size:15.5px;cursor:pointer;box-shadow:var(--shadow-accent)">Verify &amp; enter the Club</div>
+              </div>
+            </sc-if>
+          </div>
+          <div style="padding:0 30px 30px;text-align:center">
+            <div style="display:flex;justify-content:center;gap:6px;margin-bottom:12px">
+              <span style="font-size:11px;color:var(--status-success);background:var(--green-50);border-radius:999px;padding:4px 10px;font-weight:600">✓ Dealer code</span>
+              <span style="font-size:11px;color:var(--status-success);background:var(--green-50);border-radius:999px;padding:4px 10px;font-weight:600">✓ GST</span>
+              <span style="font-size:11px;color:var(--text-muted);background:var(--slate-100);border-radius:999px;padding:4px 10px;font-weight:600">Shop photo</span>
+            </div>
+            <div style="font-family:var(--font-condensed);font-weight:700;letter-spacing:0.18em;text-transform:uppercase;font-size:11px;color:var(--text-faint)">हर घर शक्ति · Har Ghar Shakti</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ======== SCROLLING SCREEN AREA ======== -->
+      <sc-if value="{{ notLogin }}" hint-placeholder-val="{{ true }}">
+        <div ref="{{ scrollRef }}" data-app-scroll="true" style="flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column">
+
+          <!-- ======== HOME ======== -->
+          <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+            <div data-screen-label="Home">
+              <!-- header -->
+              <div style="background:#fff;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--slate-100)">
+                <img src="assets/logo-mark.png" alt="" style="width:32px;height:32px;object-fit:contain;border-radius:9px">
+                <div style="flex:1">
+                  <div style="font-family:var(--font-condensed);font-weight:700;letter-spacing:0.2em;text-transform:uppercase;font-size:11px;color:var(--brand-accent-strong)">Shakti Club</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:1px">Gupta Furniture House · Ludhiana</div>
+                </div>
+                <div onClick="{{ cycleLang }}" style-hover="background:var(--slate-100)" style="border:1px solid var(--slate-200);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700;color:var(--brand-primary);cursor:pointer">{{ langChip }}</div>
+                <div onClick="{{ goNotifs }}" style-hover="background:var(--slate-100)" style="position:relative;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                  <l-icon name="bell" size="20" color="#364150"></l-icon>
+                  <span style="position:absolute;top:5px;right:5px;width:15px;height:15px;border-radius:8px;background:var(--orange-500);color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span>
+                </div>
+              </div>
+
+              <!-- greeting -->
+              <div style="display:flex;align-items:center;gap:12px;padding:16px 16px 12px">
+                <div style="width:52px;height:52px;border-radius:50%;background:conic-gradient(var(--orange-500) 0 91%, var(--slate-200) 91% 100%);display:flex;align-items:center;justify-content:center">
+                  <div style="width:44px;height:44px;border-radius:50%;background:var(--blue-700);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:16px;border:2.5px solid #fff">RG</div>
+                </div>
+                <div style="flex:1">
+                  <div style="font-family:var(--font-display);font-weight:800;font-size:19px">{{ t.hello }}</div>
+                  <div style="font-size:12px;color:var(--text-muted)">SGF-LDH-042 · 14-month partner</div>
+                </div>
+              </div>
+
+              <!-- tier / SP hero card -->
+              <div style="margin:0 16px;border-radius:20px;background:var(--grad-blue);color:#fff;padding:18px 18px 16px;position:relative;overflow:hidden;box-shadow:var(--shadow-brand)">
+                <div style="position:absolute;right:-34px;top:-34px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,0.07)"></div>
+                <div style="position:absolute;right:6px;bottom:-58px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.05)"></div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-family:var(--font-condensed);font-weight:700;letter-spacing:0.2em;text-transform:uppercase;font-size:11.5px;background:rgba(255,255,255,0.16);border-radius:999px;padding:4px 11px">Shakti Silver</span>
+                  <span style="font-size:11px;font-weight:700;background:rgba(255,186,31,0.22);color:#FFD68C;border-radius:999px;padding:4px 9px">1.1× SP</span>
+                  <div style="flex:1"></div>
+                  <img src="assets/logo-mark-white.png" alt="" style="height:22px;opacity:0.9">
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:16px">
+                  <div style="width:44px;height:44px;border-radius:50%;background:var(--grad-orange);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:22px;color:#fff;box-shadow:0 4px 14px rgba(247,148,29,0.5);animation:sc-coin 3.2s ease-in-out infinite">S</div>
+                  <div>
+                    <div style="display:flex;align-items:baseline;gap:6px">
+                      <span style="font-family:var(--font-display);font-weight:800;font-size:34px;letter-spacing:-0.01em;font-variant-numeric:tabular-nums">{{ spText }}</span>
+                      <span style="font-family:var(--font-condensed);font-weight:700;font-size:15px;letter-spacing:0.08em;color:#FFD68C">SP</span>
+                    </div>
+                    <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:-2px">{{ t.balance }} · ≈ {{ spWorth }} {{ t.worth }}</div>
+                  </div>
+                </div>
+                <div style="margin-top:16px">
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:600;color:rgba(255,255,255,0.8);margin-bottom:6px">
+                    <span>Silver</span>
+                    <span style="color:#FFD68C;font-weight:700">Shakti Gold</span>
+                  </div>
+                  <div style="height:9px;border-radius:999px;background:rgba(255,255,255,0.18);overflow:hidden">
+                    <div style="height:100%;border-radius:999px;background:var(--grad-orange);width:{{ progressW }};transition:width 1.5s cubic-bezier(0.2,0.6,0.2,1)"></div>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;margin-top:7px;font-size:11.5px;color:rgba(255,255,255,0.75)">
+                    <span>12-mo billing ₹13.7L of ₹15L</span>
+                    <span style="font-weight:700;color:#fff">₹1,30,000 {{ t.toGold }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- festival banner -->
+              <sc-if value="{{ festivalMode }}" hint-placeholder-val="{{ false }}">
+                <div style="margin:12px 16px 0;border-radius:16px;background:var(--grad-orange);color:#fff;padding:13px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-accent)">
+                  <l-icon name="party-popper" size="24" color="#ffffff"></l-icon>
+                  <div style="flex:1">
+                    <div style="font-family:var(--font-display);font-weight:800;font-size:15px">Shakti Summer Dhamaka</div>
+                    <div style="font-size:12px;opacity:0.9">2× SP on every paid invoice · ends 20 Jul</div>
+                  </div>
+                  <span style="font-family:var(--font-display);font-weight:800;font-size:20px">2×</span>
+                </div>
+              </sc-if>
+
+              <!-- scratch shelf -->
+              <div onClick="{{ openScratch }}" style-hover="transform:translateY(-2px)" style="margin:12px 16px 0;border-radius:16px;background:#fff;border:1px solid var(--slate-200);padding:12px 14px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:transform 0.18s ease;box-shadow:var(--shadow-sm)">
+                <div style="width:56px;height:42px;border-radius:10px;background:linear-gradient(135deg,#D7DDE6,#9AA8B8);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center">
+                  <span style="font-family:var(--font-condensed);font-weight:700;font-size:9px;letter-spacing:0.14em;color:#4C5969">SCRATCH</span>
+                  <span style="position:absolute;inset:0;overflow:hidden"><span style="position:absolute;top:0;bottom:0;width:26px;background:rgba(255,255,255,0.65);animation:sc-shimmer 2.2s ease-in-out infinite"></span></span>
+                </div>
+                <div style="flex:1">
+                  <div style="font-weight:700;font-size:14.5px">{{ t.scratchTitle }}</div>
+                  <div style="font-size:12px;color:var(--text-muted)">{{ scratchShelfSub }}</div>
+                </div>
+                <l-icon name="chevron-right" size="19" color="#9AA8B8"></l-icon>
+              </div>
+
+              <!-- missions -->
+              <div style="padding:20px 16px 0">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+                  <span style="font-family:var(--font-display);font-weight:800;font-size:17px">{{ t.missions }}</span>
+                  <span style="font-size:12px;color:var(--text-muted)">3 of 3 live</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <sc-for list="{{ missions }}" as="m" hint-placeholder-count="3">
+                    <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:13px 14px;box-shadow:var(--shadow-sm)">
+                      <div style="display:flex;align-items:center;gap:12px">
+                        <div style="width:40px;height:40px;border-radius:12px;background:var(--blue-50);display:flex;align-items:center;justify-content:center;flex:none">
+                          <l-icon name="{{ m.icon }}" size="20" color="#0A52B4"></l-icon>
+                        </div>
+                        <div style="flex:1;min-width:0">
+                          <div style="font-weight:700;font-size:14px;line-height:1.25">{{ m.title }}</div>
+                          <div style="font-size:12px;color:var(--text-muted);margin-top:1px">{{ m.sub }}</div>
+                        </div>
+                        <span style="font-size:11.5px;font-weight:800;color:var(--brand-accent-strong);background:var(--orange-50);border:1px solid var(--orange-100);border-radius:999px;padding:4px 10px;flex:none">{{ m.reward }}</span>
+                      </div>
+                      <sc-if value="{{ m.hasProgress }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:11px">
+                          <div style="height:6px;border-radius:999px;background:var(--slate-100);overflow:hidden">
+                            <div style="height:100%;border-radius:999px;background:var(--grad-orange);width:{{ m.pctW }};transition:width 1.2s cubic-bezier(0.2,0.6,0.2,1)"></div>
+                          </div>
+                          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:5px">
+                            <span>{{ m.progressLabel }}</span><span>{{ m.deadline }}</span>
+                          </div>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <!-- quick actions -->
+              <div style="padding:20px 16px 0">
+                <div style="font-family:var(--font-display);font-weight:800;font-size:17px;margin-bottom:10px">{{ t.quick }}</div>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+                  <sc-for list="{{ quickActions }}" as="q" hint-placeholder-count="4">
+                    <div onClick="{{ q.go }}" style-hover="transform:translateY(-2px);box-shadow:var(--shadow-md)" style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:13px 4px 11px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;transition:all 0.18s ease">
+                      <l-icon name="{{ q.icon }}" size="22" color="#0A3F86" stroke-width="1.8"></l-icon>
+                      <span style="font-size:11.5px;font-weight:600;color:var(--text-body)">{{ q.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <!-- leaderboard teaser -->
+              <div onClick="{{ goLeaderboard }}" style-hover="transform:translateY(-2px)" style="margin:20px 16px 0;background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:14px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:transform 0.18s ease;box-shadow:var(--shadow-sm)">
+                <div style="width:44px;height:44px;border-radius:50%;background:var(--orange-50);display:flex;align-items:center;justify-content:center">
+                  <l-icon name="trophy" size="21" color="#E0790C"></l-icon>
+                </div>
+                <div style="flex:1">
+                  <div style="font-weight:700;font-size:14.5px">{{ t.rank }}: <span style="color:var(--brand-accent-strong)">#4</span> of 38</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Ludhiana district · Silver league · 370 SP behind #3</div>
+                </div>
+                <span style="font-size:12.5px;font-weight:700;color:var(--text-link)">{{ t.viewBoard }}</span>
+              </div>
+
+              <div style="text-align:center;padding:26px 40px 22px">
+                <div style="font-family:var(--font-condensed);font-weight:700;letter-spacing:0.2em;text-transform:uppercase;font-size:11px;color:var(--text-faint)">हर घर शक्ति</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ======== CATALOGUE ======== -->
+          <sc-if value="{{ isShop }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Catalogue">
+              <div style="position:sticky;top:0;z-index:5;background:#fff;padding:12px 16px 10px;border-bottom:1px solid var(--slate-100)">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="flex:1;display:flex;align-items:center;gap:9px;background:var(--slate-100);border-radius:999px;padding:10px 14px">
+                    <l-icon name="search" size="16" color="#6B7A8C"></l-icon>
+                    <span style="font-size:13.5px;color:var(--text-muted)">Search model or code…</span>
+                  </div>
+                  <span style="font-size:11px;font-weight:700;color:var(--status-success);background:var(--green-50);border-radius:999px;padding:5px 10px;flex:none">Trade pricing</span>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:10px;overflow-x:auto" data-app-scroll="true">
+                  <sc-for list="{{ cats }}" as="c" hint-placeholder-count="4">
+                    <div onClick="{{ c.set }}" style="flex:none;white-space:nowrap;padding:6px 14px;border-radius:999px;font-size:12.5px;font-weight:{{ c.weight }};cursor:pointer;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }}">{{ c.label }}</div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <!-- new launch strip -->
+              <div style="margin:12px 16px 0;border-radius:16px;background:var(--cream-50);border:1px solid var(--sand-200);padding:11px 14px;display:flex;align-items:center;gap:11px">
+                <l-icon name="rocket" size="19" color="#E0790C"></l-icon>
+                <div style="flex:1;font-size:12.5px;color:var(--text-body)"><b>New launch:</b> Heritage Storage Stool earns <b style="color:var(--brand-accent-strong)">2× SP</b> till 31 Jul</div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:10px;padding:12px 16px 18px">
+                <sc-for list="{{ products }}" as="p" hint-placeholder-count="4">
+                  <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:11px;display:flex;gap:12px;box-shadow:var(--shadow-sm)">
+                    <div style="width:92px;height:98px;border-radius:12px;background:#EEF0F3;overflow:hidden;flex:none;position:relative">
+                      <sc-if value="{{ p.imgSrc }}" hint-placeholder-val="{{ false }}"><img src="{{ p.imgSrc }}" alt="" style="width:100%;height:100%;object-fit:cover"></sc-if>
+                      <sc-if value="{{ p.tag }}" hint-placeholder-val="{{ false }}">
+                        <span style="position:absolute;top:6px;left:6px;font-size:9.5px;font-weight:800;background:var(--grad-orange);color:#fff;border-radius:999px;padding:3px 8px">{{ p.tag }}</span>
+                      </sc-if>
+                    </div>
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                      <div style="font-weight:700;font-size:14px;line-height:1.25">{{ p.name }}</div>
+                      <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">{{ p.code }} · {{ p.carton }} pcs/carton · MOQ {{ p.moq }}</div>
+                      <div style="display:flex;align-items:baseline;gap:6px;margin-top:6px">
+                        <span style="font-family:var(--font-display);font-weight:800;font-size:17px">{{ p.dealerText }}</span>
+                        <span style="font-size:11px;color:var(--text-faint);text-decoration:line-through">{{ p.mrpText }}</span>
+                        <span style="font-size:10.5px;font-weight:700;color:var(--status-success);background:var(--green-50);border-radius:999px;padding:2px 7px">{{ p.marginText }}</span>
+                      </div>
+                      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+                        <span style="font-size:11px;color:var(--brand-accent-strong);font-weight:700">{{ p.spNote }}</span>
+                        <sc-if value="{{ p.inCart }}" hint-placeholder-val="{{ false }}">
+                          <div style="display:flex;align-items:center;gap:10px;background:var(--blue-50);border-radius:999px;padding:4px 6px">
+                            <div onClick="{{ p.dec }}" style="width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-xs)"><l-icon name="minus" size="14" color="#0A52B4"></l-icon></div>
+                            <span style="font-size:12.5px;font-weight:800;color:var(--brand-primary);min-width:44px;text-align:center">{{ p.qtyLabel }}</span>
+                            <div onClick="{{ p.inc }}" style="width:26px;height:26px;border-radius:50%;background:var(--blue-600);display:flex;align-items:center;justify-content:center;cursor:pointer"><l-icon name="plus" size="14" color="#ffffff"></l-icon></div>
+                          </div>
+                        </sc-if>
+                        <sc-if value="{{ p.notInCart }}" hint-placeholder-val="{{ true }}">
+                          <div onClick="{{ p.inc }}" style-hover="filter:brightness(1.06)" style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap;background:var(--grad-orange);color:#fff;border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:var(--shadow-accent)">
+                            <l-icon name="plus" size="14" color="#ffffff"></l-icon>{{ t.addPO }}
+                          </div>
+                        </sc-if>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+
+                <!-- co-creation poll -->
+                <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:14px;box-shadow:var(--shadow-sm)">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <l-icon name="vote" size="19" color="#0A52B4"></l-icon>
+                    <div style="font-weight:700;font-size:14px">Vote: next colour for Maharaja?</div>
+                  </div>
+                  <div style="display:flex;gap:12px;margin-top:12px">
+                    <sc-for list="{{ pollColors }}" as="pc" hint-placeholder-count="4">
+                      <div onClick="{{ pc.pick }}" style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer">
+                        <span style="width:38px;height:38px;border-radius:50%;background:{{ pc.hex }};box-shadow:{{ pc.ring }}"></span>
+                        <span style="font-size:10.5px;font-weight:600;color:var(--text-muted)">{{ pc.label }}</span>
+                      </div>
+                    </sc-for>
+                    <div style="flex:1"></div>
+                    <sc-if value="{{ voted }}" hint-placeholder-val="{{ false }}">
+                      <span style="align-self:center;font-size:11.5px;font-weight:700;color:var(--status-success);background:var(--green-50);border-radius:999px;padding:5px 11px">Vote counted ✓</span>
+                    </sc-if>
+                  </div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:10px">1,240 dealers voted this week. Winning colour goes to the mould.</div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ======== REWARDS ======== -->
+          <sc-if value="{{ isRewards }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Rewards Store">
+              <div style="position:sticky;top:0;z-index:5;background:#fff;padding:14px 16px 12px;border-bottom:1px solid var(--slate-100)">
+                <div style="display:flex;align-items:center;gap:11px">
+                  <div style="width:38px;height:38px;border-radius:50%;background:var(--grad-orange);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:19px;color:#fff">S</div>
+                  <div style="flex:1">
+                    <div style="display:flex;align-items:baseline;gap:5px">
+                      <span style="font-family:var(--font-display);font-weight:800;font-size:22px;font-variant-numeric:tabular-nums">{{ spText }}</span>
+                      <span style="font-family:var(--font-condensed);font-weight:700;font-size:13px;letter-spacing:0.08em;color:var(--brand-accent-strong)">SP</span>
+                    </div>
+                    <div style="font-size:11.5px;color:var(--text-muted);margin-top:-2px">1 SP = ₹0.25 · min. redemption 2,000 SP</div>
+                  </div>
+                  <span style="font-size:11px;font-weight:700;color:var(--amber-600);background:var(--amber-50);border:1px solid #F3E3B2;border-radius:999px;padding:5px 10px">1,150 SP expire 31 Aug</span>
+                </div>
+              </div>
+
+              <div style="padding:14px 16px 18px;display:flex;flex-direction:column;gap:18px">
+                <sc-for list="{{ rewardGroups }}" as="g" hint-placeholder-count="3">
+                  <div>
+                    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:9px">
+                      <span style="font-family:var(--font-display);font-weight:800;font-size:15.5px">{{ g.label }}</span>
+                      <span style="font-size:11.5px;color:var(--text-muted)">{{ g.note }}</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <sc-for list="{{ g.items }}" as="r" hint-placeholder-count="3">
+                        <div style="background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:11px 13px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-xs)">
+                          <div style="width:38px;height:38px;border-radius:11px;background:{{ r.tileBg }};display:flex;align-items:center;justify-content:center;flex:none">
+                            <l-icon name="{{ r.icon }}" size="19" color="{{ r.tileColor }}"></l-icon>
+                          </div>
+                          <div style="flex:1;min-width:0">
+                            <div style="font-weight:700;font-size:13.5px">{{ r.name }}</div>
+                            <div style="font-size:11.5px;color:var(--text-muted)">{{ r.sub }}</div>
+                          </div>
+                          <div style="text-align:right;flex:none">
+                            <div style="font-size:12.5px;font-weight:800;color:var(--brand-accent-strong)">{{ r.spText }}</div>
+                            <div onClick="{{ r.redeem }}" style-hover="filter:brightness(1.05)" style="margin-top:5px;white-space:nowrap;font-size:11.5px;font-weight:700;border-radius:999px;padding:5px 13px;cursor:{{ r.cursor }};background:{{ r.btnBg }};color:{{ r.btnColor }};box-shadow:{{ r.btnShadow }}">{{ r.btnLabel }}</div>
+                          </div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+
+                <!-- experiences -->
+                <div style="border-radius:16px;background:var(--grad-navy);color:#fff;padding:16px;position:relative;overflow:hidden">
+                  <div style="position:absolute;right:-24px;top:-24px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,0.06)"></div>
+                  <div style="font-family:var(--font-condensed);font-weight:700;letter-spacing:0.18em;text-transform:uppercase;font-size:11px;color:#FFD68C">By invitation · Gold &amp; above</div>
+                  <div style="font-family:var(--font-display);font-weight:800;font-size:18px;margin-top:5px">Factory VIP visit + dinner with the founder</div>
+                  <div style="font-size:12.5px;color:rgba(255,255,255,0.75);margin-top:6px">Reach Shakti Gold to unlock. ₹1,30,000 billing to go — you are closer than you think.</div>
+                </div>
+
+                <!-- history -->
+                <div>
+                  <div style="font-family:var(--font-display);font-weight:800;font-size:15.5px;margin-bottom:9px">Redemption history</div>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <sc-for list="{{ history }}" as="h" hint-placeholder-count="2">
+                      <div style="background:#fff;border:1px solid var(--slate-200);border-radius:12px;padding:10px 13px;display:flex;align-items:center;gap:10px">
+                        <l-icon name="{{ h.icon }}" size="16" color="#6B7A8C"></l-icon>
+                        <div style="flex:1;font-size:12.5px;color:var(--text-body)">{{ h.text }}</div>
+                        <span style="font-size:11px;color:var(--text-faint)">{{ h.date }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ======== LEDGER ======== -->
+          <sc-if value="{{ isLedger }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Ledger">
+              <div style="padding:16px 16px 0">
+                <div style="font-family:var(--font-display);font-weight:800;font-size:20px;margin-bottom:12px">{{ t.ledger }}</div>
+                <div style="background:#fff;border:1px solid var(--slate-200);border-radius:18px;padding:16px;box-shadow:var(--shadow-sm)">
+                  <div style="display:flex;gap:12px">
+                    <div style="flex:1">
+                      <div style="font-size:11.5px;color:var(--text-muted)">Outstanding</div>
+                      <div style="font-family:var(--font-display);font-weight:800;font-size:22px;margin-top:2px">₹86,400</div>
+                    </div>
+                    <div style="width:1px;background:var(--slate-100)"></div>
+                    <div style="flex:1">
+                      <div style="font-size:11.5px;color:var(--text-muted)">Credit days</div>
+                      <div style="font-family:var(--font-display);font-weight:800;font-size:22px;margin-top:2px">37 <span style="font-size:11px;font-weight:700;color:var(--status-success);background:var(--green-50);border-radius:999px;padding:2px 7px;vertical-align:middle">+7 Silver</span></div>
+                    </div>
+                  </div>
+                  <div style="margin-top:14px">
+                    <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-muted);margin-bottom:5px">
+                      <span>Credit used</span><span>₹86,400 of ₹3,00,000</span>
+                    </div>
+                    <div style="height:7px;border-radius:999px;background:var(--slate-100);overflow:hidden">
+                      <div style="height:100%;width:29%;border-radius:999px;background:var(--grad-blue)"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top:12px;border-radius:16px;background:var(--orange-50);border:1px solid var(--orange-100);padding:13px 15px;display:flex;align-items:center;gap:12px">
+                  <div style="width:38px;height:38px;border-radius:50%;background:var(--grad-orange);display:flex;align-items:center;justify-content:center;animation:sc-pulse 2.4s ease-in-out infinite;flex:none">
+                    <l-icon name="zap" size="18" color="#ffffff"></l-icon>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font-weight:700;font-size:13.5px;color:var(--orange-900)">{{ t.payNudge }}</div>
+                    <div style="font-size:12px;color:var(--orange-800);margin-top:1px">INV-2262 · earns you <b>+540 bonus SP</b></div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding:18px 16px">
+                <div style="font-family:var(--font-display);font-weight:800;font-size:15.5px;margin-bottom:9px">Invoices</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ invoices }}" as="inv" hint-placeholder-count="4">
+                    <div style="background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px">
+                      <div style="flex:1">
+                        <div style="font-weight:700;font-size:13.5px">{{ inv.no }} <span style="font-weight:500;color:var(--text-faint);font-size:11.5px">· {{ inv.date }}</span></div>
+                        <div style="font-size:12px;color:var(--text-muted);margin-top:2px">{{ inv.sub }}</div>
+                      </div>
+                      <div style="text-align:right">
+                        <div style="font-family:var(--font-display);font-weight:800;font-size:15px">{{ inv.amount }}</div>
+                        <span style="font-size:10.5px;font-weight:700;border-radius:999px;padding:3px 9px;background:{{ inv.chipBg }};color:{{ inv.chipColor }}">{{ inv.status }}</span>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="font-size:11.5px;color:var(--text-muted);margin-top:12px;line-height:1.5">SP are credited only when an invoice is fully paid and reconciled. Returns claw back points automatically.</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ======== LEADERBOARD & BADGES ======== -->
+          <sc-if value="{{ isLeaderboard }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Leaderboard">
+              <div style="position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--slate-100);padding:10px 16px 12px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div onClick="{{ goBack }}" style-hover="background:var(--slate-100)" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><l-icon name="arrow-left" size="19" color="#0E1B2E"></l-icon></div>
+                  <div style="font-family:var(--font-display);font-weight:800;font-size:18px;flex:1">Leaderboard</div>
+                  <span style="font-size:11px;font-weight:700;color:var(--brand-primary);background:var(--blue-50);border-radius:999px;padding:4px 10px">Silver league</span>
+                </div>
+                <div style="display:flex;background:var(--slate-100);border-radius:999px;padding:3px;margin-top:11px">
+                  <div onClick="{{ lbDistrict }}" style="flex:1;text-align:center;padding:7px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;background:{{ lbDistrictBg }};color:{{ lbDistrictColor }};box-shadow:{{ lbDistrictShadow }};transition:all 0.2s ease">Ludhiana district</div>
+                  <div onClick="{{ lbState }}" style="flex:1;text-align:center;padding:7px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;background:{{ lbStateBg }};color:{{ lbStateColor }};box-shadow:{{ lbStateShadow }};transition:all 0.2s ease">Punjab state</div>
+                </div>
+              </div>
+
+              <div style="padding:14px 16px 4px">
+                <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:9px">July · ranked by SP earned, not billing · resets monthly</div>
+                <div style="display:flex;flex-direction:column;gap:7px">
+                  <sc-for list="{{ lbRows }}" as="row" hint-placeholder-count="6">
+                    <div style="display:flex;align-items:center;gap:12px;border-radius:14px;padding:11px 13px;background:{{ row.bg }};border:1px solid {{ row.border }};box-shadow:{{ row.shadow }}">
+                      <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12.5px;background:{{ row.rankBg }};color:{{ row.rankColor }};flex:none">{{ row.rank }}</div>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-weight:700;font-size:13.5px;color:{{ row.nameColor }}">{{ row.name }}</div>
+                        <div style="font-size:11.5px;color:{{ row.subColor }}">{{ row.city }}</div>
+                      </div>
+                      <div style="font-family:var(--font-display);font-weight:800;font-size:14.5px;white-space:nowrap;flex:none;color:{{ row.spColor }}">{{ row.sp }} <span style="font-family:var(--font-condensed);font-size:11px;letter-spacing:0.06em">SP</span></div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div onClick="{{ shareCard }}" style-hover="filter:brightness(1.05)" style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--blue-600);color:#fff;border-radius:999px;padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:var(--shadow-brand)">
+                  <l-icon name="share-2" size="16" color="#ffffff"></l-icon>Share my champion card on WhatsApp
+                </div>
+              </div>
+
+              <div style="padding:20px 16px 20px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+                  <span style="font-family:var(--font-display);font-weight:800;font-size:15.5px">Trophy case</span>
+                  <span style="font-size:11.5px;color:var(--text-muted)">4 of 9 earned</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px">
+                  <sc-for list="{{ badges }}" as="b" hint-placeholder-count="9">
+                    <div style="background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:13px 6px 11px;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;opacity:{{ b.opacity }}">
+                      <div style="width:42px;height:42px;border-radius:50%;background:{{ b.tileBg }};display:flex;align-items:center;justify-content:center">
+                        <l-icon name="{{ b.icon }}" size="20" color="{{ b.iconColor }}"></l-icon>
+                      </div>
+                      <div style="font-size:11px;font-weight:700;line-height:1.25">{{ b.name }}</div>
+                      <div style="font-size:9.5px;color:var(--text-muted);line-height:1.3">{{ b.sub }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ======== SCAN ======== -->
+          <sc-if value="{{ isScan }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Scan QR" style="flex:1;display:flex;flex-direction:column;background:var(--blue-900);color:#fff;min-height:100%">
+              <div style="display:flex;align-items:center;gap:10px;padding:12px 16px">
+                <div onClick="{{ goBack }}" style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer"><l-icon name="arrow-left" size="19" color="#ffffff"></l-icon></div>
+                <div style="font-family:var(--font-display);font-weight:800;font-size:18px;flex:1">Scan cartons</div>
+                <span style="font-size:11px;font-weight:700;background:rgba(255,255,255,0.14);border-radius:999px;padding:4px 10px">+5 SP / carton</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 30px">
+                <div style="position:relative;width:230px;height:230px">
+                  <div style="position:absolute;top:0;left:0;width:38px;height:38px;border-top:3.5px solid var(--orange-400);border-left:3.5px solid var(--orange-400);border-top-left-radius:14px"></div>
+                  <div style="position:absolute;top:0;right:0;width:38px;height:38px;border-top:3.5px solid var(--orange-400);border-right:3.5px solid var(--orange-400);border-top-right-radius:14px"></div>
+                  <div style="position:absolute;bottom:0;left:0;width:38px;height:38px;border-bottom:3.5px solid var(--orange-400);border-left:3.5px solid var(--orange-400);border-bottom-left-radius:14px"></div>
+                  <div style="position:absolute;bottom:0;right:0;width:38px;height:38px;border-bottom:3.5px solid var(--orange-400);border-right:3.5px solid var(--orange-400);border-bottom-right-radius:14px"></div>
+                  <div style="position:absolute;inset:22px;border-radius:14px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center">
+                    <l-icon name="package" size="84" color="rgba(255,255,255,0.35)" stroke-width="1.2"></l-icon>
+                  </div>
+                  <div style="position:absolute;left:10px;right:10px;height:3px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--orange-400),transparent);animation:sc-scanline 2.6s ease-in-out infinite;box-shadow:0 0 14px rgba(247,148,29,0.8)"></div>
+                </div>
+                <div style="margin-top:26px;text-align:center">
+                  <div style="font-size:13px;color:rgba(255,255,255,0.7)">Point at the QR on the carton flap</div>
+                  <div style="font-family:var(--font-display);font-weight:800;font-size:26px;margin-top:8px;font-variant-numeric:tabular-nums">{{ scanCountText }} <span style="font-size:14px;font-weight:600;color:rgba(255,255,255,0.6)">of 130 cartons</span></div>
+                  <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-top:3px">INV-2231 · geo-verified · one scan per QR, ever</div>
+                  <div style="width:220px;height:6px;border-radius:999px;background:rgba(255,255,255,0.15);overflow:hidden;margin:12px auto 0">
+                    <div style="height:100%;border-radius:999px;background:var(--grad-orange);width:{{ scanPctW }};transition:width 0.5s ease"></div>
+                  </div>
+                </div>
+              </div>
+              <div style="padding:0 24px 26px">
+                <div onClick="{{ simulateScan }}" style-hover="filter:brightness(1.07)" style="background:var(--grad-orange);border-radius:999px;padding:15px;text-align:center;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 8px 26px rgba(247,148,29,0.45)">Simulate a carton scan</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ======== ORDERS ======== -->
+          <sc-if value="{{ isOrders }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Orders">
+              <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff;border-bottom:1px solid var(--slate-100)">
+                <div onClick="{{ goBack }}" style-hover="background:var(--slate-100)" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><l-icon name="arrow-left" size="19" color="#0E1B2E"></l-icon></div>
+                <div style="font-family:var(--font-display);font-weight:800;font-size:18px">Orders &amp; tracking</div>
+              </div>
+              <div style="padding:14px 16px 18px;display:flex;flex-direction:column;gap:12px">
+                <div style="background:#fff;border:1px solid var(--slate-200);border-radius:18px;padding:16px;box-shadow:var(--shadow-sm)">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                    <div style="flex:1">
+                      <div style="font-weight:800;font-size:15px">ORD-1147</div>
+                      <div style="font-size:11.5px;color:var(--text-muted)">312 pcs · ₹2,04,800 · placed 02 Jul</div>
+                    </div>
+                    <span style="font-size:11px;font-weight:700;color:var(--brand-primary);background:var(--blue-50);border-radius:999px;padding:4px 11px">In transit</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column">
+                    <sc-for list="{{ orderSteps }}" as="st" hint-placeholder-count="4">
+                      <div style="display:flex;gap:12px">
+                        <div style="display:flex;flex-direction:column;align-items:center">
+                          <div style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:{{ st.dotBg }};border:2px solid {{ st.dotBorder }};flex:none">
+                            <l-icon name="{{ st.icon }}" size="13" color="{{ st.iconColor }}"></l-icon>
+                          </div>
+                          <sc-if value="{{ st.hasLine }}" hint-placeholder-val="{{ true }}">
+                            <div style="width:2px;flex:1;min-height:22px;background:{{ st.lineBg }}"></div>
+                          </sc-if>
+                        </div>
+                        <div style="padding-bottom:16px">
+                          <div style="font-weight:700;font-size:13.5px;color:{{ st.titleColor }}">{{ st.title }}</div>
+                          <div style="font-size:11.5px;color:var(--text-muted);margin-top:1px">{{ st.sub }}</div>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div onClick="{{ goScan }}" style-hover="filter:brightness(1.05)" style="margin-top:2px;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--grad-orange);color:#fff;border-radius:999px;padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:var(--shadow-accent)">
+                    <l-icon name="qr-code" size="16" color="#ffffff"></l-icon>Delivered? Scan cartons → earn ~650 SP
+                  </div>
+                </div>
+
+                <div style="font-family:var(--font-display);font-weight:800;font-size:15.5px;margin-top:4px">Past orders</div>
+                <sc-for list="{{ pastOrders }}" as="po" hint-placeholder-count="3">
+                  <div style="background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px">
+                    <l-icon name="package-check" size="19" color="#1E9E5A"></l-icon>
+                    <div style="flex:1">
+                      <div style="font-weight:700;font-size:13.5px">{{ po.no }} <span style="font-weight:500;color:var(--text-faint);font-size:11.5px">· {{ po.date }}</span></div>
+                      <div style="font-size:11.5px;color:var(--text-muted)">{{ po.sub }}</div>
+                    </div>
+                    <span style="font-size:11px;font-weight:800;color:var(--brand-accent-strong)">{{ po.sp }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ======== MEDIA KIT ======== -->
+          <sc-if value="{{ isMedia }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Media Kit">
+              <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff;border-bottom:1px solid var(--slate-100)">
+                <div onClick="{{ goBack }}" style-hover="background:var(--slate-100)" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><l-icon name="arrow-left" size="19" color="#0E1B2E"></l-icon></div>
+                <div style="flex:1">
+                  <div style="font-family:var(--font-display);font-weight:800;font-size:18px">Shakti Media Kit</div>
+                  <div style="font-size:11.5px;color:var(--text-muted)">Auto-stamped: Gupta Furniture House · 98140 22331</div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:14px 16px 18px">
+                <sc-for list="{{ mediaItems }}" as="mi" hint-placeholder-count="4">
+                  <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm)">
+                    <div style="height:120px;background:#EEF0F3;position:relative">
+                      <sc-if value="{{ mi.imgSrc }}" hint-placeholder-val="{{ false }}"><img src="{{ mi.imgSrc }}" alt="" style="width:100%;height:100%;object-fit:cover"></sc-if>
+                      <div style="position:absolute;left:0;right:0;bottom:0;background:rgba(11,33,66,0.82);color:#fff;font-size:8px;padding:4px 8px;display:flex;justify-content:space-between">
+                        <span style="font-weight:700">GUPTA FURNITURE HOUSE</span><span>98140 22331</span>
+                      </div>
+                    </div>
+                    <div style="padding:10px 11px 11px">
+                      <div style="font-weight:700;font-size:12.5px;line-height:1.3">{{ mi.name }}</div>
+                      <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px">{{ mi.sub }}</div>
+                      <div onClick="{{ mi.send }}" style-hover="filter:brightness(1.06)" style="margin-top:9px;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--blue-600);color:#fff;border-radius:999px;padding:7px;font-size:11.5px;font-weight:700;cursor:pointer">
+                        <l-icon name="send" size="13" color="#ffffff"></l-icon>Send on WhatsApp
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ======== SUPPORT ======== -->
+          <sc-if value="{{ isSupport }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Support">
+              <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff;border-bottom:1px solid var(--slate-100)">
+                <div onClick="{{ goBack }}" style-hover="background:var(--slate-100)" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><l-icon name="arrow-left" size="19" color="#0E1B2E"></l-icon></div>
+                <div style="font-family:var(--font-display);font-weight:800;font-size:18px">Support &amp; warranty</div>
+              </div>
+              <div style="padding:14px 16px 18px;display:flex;flex-direction:column;gap:12px">
+                <div style="border-radius:16px;background:var(--cream-50);border:1px solid var(--sand-200);padding:14px 15px;display:flex;gap:12px;align-items:center">
+                  <l-icon name="shield-check" size="26" color="#0A3F86" stroke-width="1.7"></l-icon>
+                  <div style="font-size:12.5px;color:var(--text-body);line-height:1.5"><b>10-year warranty, visible process.</b> Raise a replacement with photos — track it like an order. Approved claims dispatch with your next truck.</div>
+                </div>
+
+                <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:14px;box-shadow:var(--shadow-sm)">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="flex:1">
+                      <div style="font-weight:800;font-size:14px">TKT-0312 · Sonet leg crack</div>
+                      <div style="font-size:11.5px;color:var(--text-muted)">2 units · photos attached · raised 28 Jun</div>
+                    </div>
+                    <span style="font-size:11px;font-weight:700;color:var(--status-success);background:var(--green-50);border-radius:999px;padding:4px 10px">Replacement approved</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-top:13px">
+                    <div style="flex:1;height:5px;border-radius:999px;background:var(--green-500)"></div>
+                    <div style="flex:1;height:5px;border-radius:999px;background:var(--green-500)"></div>
+                    <div style="flex:1;height:5px;border-radius:999px;background:var(--slate-200)"></div>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-muted);margin-top:5px">
+                    <span>Received</span><span style="color:var(--status-success);font-weight:700">Approved</span><span>Dispatches with ORD-1147</span>
+                  </div>
+                </div>
+
+                <div onClick="{{ newTicket }}" style-hover="filter:brightness(1.05)" style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--grad-orange);color:#fff;border-radius:999px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:var(--shadow-accent)">
+                  <l-icon name="camera" size="17" color="#ffffff"></l-icon>New complaint with photo
+                </div>
+
+                <div style="display:flex;gap:10px">
+                  <div style="flex:1;background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:13px;display:flex;align-items:center;gap:10px">
+                    <l-icon name="phone" size="18" color="#0A52B4"></l-icon>
+                    <div>
+                      <div style="font-size:12.5px;font-weight:700">Helpline</div>
+                      <div style="font-size:11px;color:var(--text-muted)">1800 ­102 4455</div>
+                    </div>
+                  </div>
+                  <div style="flex:1;background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:13px;display:flex;align-items:center;gap:10px">
+                    <l-icon name="message-circle" size="18" color="#1E9E5A"></l-icon>
+                    <div>
+                      <div style="font-size:12.5px;font-weight:700">WhatsApp</div>
+                      <div style="font-size:11px;color:var(--text-muted)">Reply in 2 hrs</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ======== NOTIFICATIONS ======== -->
+          <sc-if value="{{ isNotifs }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="Notifications">
+              <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff;border-bottom:1px solid var(--slate-100)">
+                <div onClick="{{ goBack }}" style-hover="background:var(--slate-100)" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer"><l-icon name="arrow-left" size="19" color="#0E1B2E"></l-icon></div>
+                <div style="font-family:var(--font-display);font-weight:800;font-size:18px">Notifications</div>
+              </div>
+              <div style="padding:12px 16px 18px;display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ notifs }}" as="n" hint-placeholder-count="5">
+                  <div style="background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:12px 13px;display:flex;gap:12px;align-items:flex-start">
+                    <div style="width:36px;height:36px;border-radius:11px;background:{{ n.tileBg }};display:flex;align-items:center;justify-content:center;flex:none">
+                      <l-icon name="{{ n.icon }}" size="17" color="{{ n.iconColor }}"></l-icon>
+                    </div>
+                    <div style="flex:1">
+                      <div style="font-weight:700;font-size:13px;line-height:1.3">{{ n.title }}</div>
+                      <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;line-height:1.4">{{ n.sub }}</div>
+                    </div>
+                    <span style="font-size:10.5px;color:var(--text-faint);flex:none">{{ n.time }}</span>
+                  </div>
+                </sc-for>
+                <div style="font-size:11.5px;color:var(--text-muted);text-align:center;margin-top:8px">Also mirrored on WhatsApp for offline dealers</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ======== MORE ======== -->
+          <sc-if value="{{ isMore }}" hint-placeholder-val="{{ false }}">
+            <div data-screen-label="More">
+              <div style="padding:16px 16px 0">
+                <div style="background:#fff;border:1px solid var(--slate-200);border-radius:18px;padding:16px;display:flex;align-items:center;gap:13px;box-shadow:var(--shadow-sm)">
+                  <div style="width:54px;height:54px;border-radius:50%;background:conic-gradient(var(--orange-500) 0 91%, var(--slate-200) 91% 100%);display:flex;align-items:center;justify-content:center">
+                    <div style="width:46px;height:46px;border-radius:50%;background:var(--blue-700);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:17px;border:2.5px solid #fff">RG</div>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font-family:var(--font-display);font-weight:800;font-size:16.5px">Rajesh Gupta</div>
+                    <div style="font-size:12px;color:var(--text-muted)">Gupta Furniture House · SGF-LDH-042</div>
+                  </div>
+                  <span style="font-family:var(--font-condensed);font-weight:700;letter-spacing:0.14em;text-transform:uppercase;font-size:10.5px;color:var(--brand-primary);background:var(--blue-50);border-radius:999px;padding:5px 11px">Silver</span>
+                </div>
+
+                <!-- tier compare -->
+                <div style="margin-top:12px;background:#fff;border:1px solid var(--slate-200);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-sm)">
+                  <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;background:var(--slate-50);border-bottom:1px solid var(--slate-100);padding:10px 14px;font-family:var(--font-condensed);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;font-size:10.5px;color:var(--text-muted)">
+                    <span>Benefit</span><span style="color:var(--brand-primary)">Silver · you</span><span style="color:var(--brand-accent-strong)">Gold · next</span>
+                  </div>
+                  <sc-for list="{{ tierRows }}" as="tr" hint-placeholder-count="4">
+                    <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;padding:10px 14px;border-bottom:1px solid var(--slate-100);font-size:12px">
+                      <span style="color:var(--text-muted)">{{ tr.label }}</span>
+                      <span style="font-weight:600">{{ tr.silver }}</span>
+                      <span style="font-weight:700;color:var(--brand-accent-strong)">{{ tr.gold }}</span>
+                    </div>
+                  </sc-for>
+                  <div style="padding:11px 14px;font-size:11.5px;color:var(--text-muted)">Tiers use rolling 12-month paid billing, reviewed quarterly. One grace quarter before any demotion.</div>
+                </div>
+
+                <!-- language -->
+                <div style="margin-top:12px;background:#fff;border:1px solid var(--slate-200);border-radius:18px;padding:14px;box-shadow:var(--shadow-sm)">
+                  <div style="font-weight:700;font-size:13.5px;margin-bottom:10px">Language / भाषा / ਭਾਸ਼ਾ</div>
+                  <div style="display:flex;gap:8px">
+                    <sc-for list="{{ langs }}" as="lg2" hint-placeholder-count="3">
+                      <div onClick="{{ lg2.set }}" style="flex:1;white-space:nowrap;text-align:center;padding:9px;border-radius:999px;font-size:13px;font-weight:{{ lg2.weight }};cursor:pointer;border:1px solid {{ lg2.border }};background:{{ lg2.bg }};color:{{ lg2.color }}">{{ lg2.label }}</div>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <!-- menu -->
+                <div style="margin-top:12px;background:#fff;border:1px solid var(--slate-200);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-sm)">
+                  <sc-for list="{{ moreMenu }}" as="mm" hint-placeholder-count="6">
+                    <div onClick="{{ mm.go }}" style-hover="background:var(--slate-50)" style="display:flex;align-items:center;gap:13px;padding:13px 15px;border-bottom:1px solid var(--slate-100);cursor:pointer">
+                      <l-icon name="{{ mm.icon }}" size="19" color="#0A3F86" stroke-width="1.8"></l-icon>
+                      <span style="flex:1;font-size:13.5px;font-weight:600">{{ mm.label }}</span>
+                      <l-icon name="chevron-right" size="17" color="#C3CEDA"></l-icon>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <div style="text-align:center;padding:18px 30px 20px;font-size:10.5px;color:var(--text-faint);line-height:1.6">Shakti Club is a discretionary trade programme of SGF Shakti Moulded Furniture. Points are non-transferable. T&amp;C apply.<br>App v1.0 · <span onClick="{{ logout }}" style="color:var(--text-link);font-weight:600;cursor:pointer">Log out</span></div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- ======== CART FAB ======== -->
+        <sc-if value="{{ showFab }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ openCart }}" style-hover="transform:scale(1.05)" style="position:absolute;right:16px;bottom:76px;background:var(--grad-orange);color:#fff;border-radius:999px;padding:13px 18px;display:flex;align-items:center;gap:9px;cursor:pointer;box-shadow:0 10px 28px rgba(247,148,29,0.5);transition:transform 0.15s ease;z-index:20;animation:sc-pop 0.3s ease">
+            <l-icon name="shopping-cart" size="18" color="#ffffff"></l-icon>
+            <span style="font-weight:800;font-size:13.5px">{{ cartCountLabel }} · {{ cartTotalText }}</span>
+          </div>
+        </sc-if>
+
+        <!-- ======== BOTTOM NAV ======== -->
+        <div style="display:flex;background:#fff;border-top:1px solid var(--slate-200);padding-bottom:2px;z-index:15">
+          <sc-for list="{{ navItems }}" as="nv" hint-placeholder-count="5">
+            <div onClick="{{ nv.go }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 6px;cursor:pointer;position:relative">
+              <div style="position:absolute;top:0;width:34px;height:3px;border-radius:0 0 4px 4px;background:{{ nv.indicatorBg }}"></div>
+              <l-icon name="{{ nv.icon }}" size="21" color="{{ nv.color }}" stroke-width="{{ nv.stroke }}"></l-icon>
+              <span style="font-size:10px;font-weight:{{ nv.weight }};color:{{ nv.color }}">{{ nv.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- ======== TOAST ======== -->
+      <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;top:14px;left:16px;right:16px;z-index:60;background:var(--blue-900);color:#fff;border-radius:16px;padding:12px 15px;display:flex;align-items:center;gap:11px;box-shadow:var(--shadow-lg);animation:sc-toast-in 0.3s cubic-bezier(0.2,0.6,0.2,1)">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--grad-orange);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:16px;flex:none">S</div>
+          <div style="flex:1">
+            <div style="font-weight:800;font-size:13.5px">{{ toastTitle }}</div>
+            <div style="font-size:11.5px;color:rgba(255,255,255,0.7)">{{ toastSub }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ======== SCRATCH OVERLAY ======== -->
+      <sc-if value="{{ scratchOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:50;background:rgba(11,27,46,0.72);display:flex;align-items:center;justify-content:center;animation:sc-fade-in 0.25s ease">
+          {{ confettiEl }}
+          <div style="background:#fff;border-radius:24px;padding:22px 20px 20px;width:308px;text-align:center;position:relative;animation:sc-pop 0.35s cubic-bezier(0.2,0.6,0.2,1)">
+            <div onClick="{{ closeScratch }}" style="position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:var(--slate-100);display:flex;align-items:center;justify-content:center;cursor:pointer"><l-icon name="x" size="16" color="#4C5969"></l-icon></div>
+            <div style="font-family:var(--font-condensed);font-weight:700;letter-spacing:0.2em;text-transform:uppercase;font-size:11px;color:var(--brand-accent-strong)">Invoice INV-2231 paid</div>
+            <div style="font-family:var(--font-display);font-weight:800;font-size:20px;margin-top:4px">{{ t.scratchTitle }}</div>
+            <div style="position:relative;width:264px;height:150px;margin:16px auto 0;border-radius:16px;overflow:hidden;background:var(--orange-50);border:1px solid var(--orange-100)">
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+                <div style="width:44px;height:44px;border-radius:50%;background:var(--grad-orange);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:22px;color:#fff;animation:sc-coin 2.6s ease-in-out infinite">S</div>
+                <div style="font-family:var(--font-display);font-weight:800;font-size:30px;color:var(--brand-accent-strong)">+250 SP</div>
+                <div style="font-size:11.5px;color:var(--text-muted)">≈ ₹62 · lucky draw entry added</div>
+              </div>
+              <canvas ref="{{ scratchRef }}" width="264" height="150" onPointerDown="{{ scratchDown }}" onPointerMove="{{ scratchMove }}" onPointerUp="{{ scratchUp }}" style="position:absolute;inset:0;touch-action:none;cursor:grab;opacity:{{ scratchCanvasOpacity }};transition:opacity 0.6s ease"></canvas>
+            </div>
+            <sc-if value="{{ scratchDone }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ collectScratch }}" style-hover="filter:brightness(1.05)" style="margin-top:16px;background:var(--grad-orange);color:#fff;border-radius:999px;padding:13px;font-weight:800;font-size:14.5px;cursor:pointer;box-shadow:var(--shadow-accent);animation:sc-pop 0.4s ease">Collect 250 SP</div>
+            </sc-if>
+            <sc-if value="{{ scratchNotDone }}" hint-placeholder-val="{{ true }}">
+              <div style="margin-top:16px;font-size:12px;color:var(--text-muted)">Rub the card with your finger</div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ======== CART SHEET ======== -->
+      <sc-if value="{{ cartOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;justify-content:flex-end">
+          <div onClick="{{ closeCart }}" style="position:absolute;inset:0;background:rgba(11,27,46,0.55);animation:sc-fade-in 0.25s ease"></div>
+          <div style="position:relative;background:#fff;border-radius:24px 24px 0 0;padding:10px 18px 20px;max-height:78%;overflow-y:auto;animation:sc-sheet-up 0.35s cubic-bezier(0.2,0.6,0.2,1)" data-app-scroll="true">
+            <div style="width:40px;height:4px;border-radius:2px;background:var(--slate-200);margin:0 auto 14px"></div>
+            <sc-if value="{{ notOrderPlaced }}" hint-placeholder-val="{{ true }}">
+              <div style="font-family:var(--font-display);font-weight:800;font-size:19px;margin-bottom:12px">Order request</div>
+              <div style="display:flex;flex-direction:column;gap:9px">
+                <sc-for list="{{ cartLines }}" as="cl" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:11px;border:1px solid var(--slate-200);border-radius:14px;padding:9px 11px">
+                    <div style="width:46px;height:46px;border-radius:10px;background:#EEF0F3;overflow:hidden;flex:none"><sc-if value="{{ cl.imgSrc }}" hint-placeholder-val="{{ false }}"><img src="{{ cl.imgSrc }}" alt="" style="width:100%;height:100%;object-fit:cover"></sc-if></div>
+                    <div style="flex:1;min-width:0">
+                      <div style="font-weight:700;font-size:13px">{{ cl.name }}</div>
+                      <div style="font-size:11.5px;color:var(--text-muted)">{{ cl.qtyLabel }} × {{ cl.priceText }}</div>
+                    </div>
+                    <div style="font-family:var(--font-display);font-weight:800;font-size:14px">{{ cl.lineTotal }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:14px">
+                <span style="font-size:13px;color:var(--text-muted)">Total (ex-GST)</span>
+                <span style="font-family:var(--font-display);font-weight:800;font-size:22px">{{ cartTotalText }}</span>
+              </div>
+              <div style="margin-top:10px;border-radius:14px;background:var(--orange-50);border:1px solid var(--orange-100);padding:11px 13px;display:flex;align-items:center;gap:10px">
+                <div style="width:30px;height:30px;border-radius:50%;background:var(--grad-orange);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:14px;color:#fff">S</div>
+                <div style="font-size:12.5px;color:var(--orange-900)">Earns <b>~{{ cartSpText }} SP</b> when the invoice is paid <span style="color:var(--orange-800)">(+540 more if paid early)</span></div>
+              </div>
+              <div onClick="{{ placeOrder }}" style-hover="filter:brightness(1.05)" style="margin-top:14px;background:var(--grad-orange);color:#fff;border-radius:999px;padding:15px;text-align:center;font-weight:800;font-size:15px;cursor:pointer;box-shadow:var(--shadow-accent)">{{ t.sendOrder }}</div>
+              <div style="text-align:center;font-size:11.5px;color:var(--text-muted);margin-top:9px">Our team confirms price &amp; dispatch on WhatsApp within 2 hours</div>
+            </sc-if>
+            <sc-if value="{{ orderPlaced }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;padding:14px 6px 6px;animation:sc-pop 0.4s ease">
+                <div style="position:relative;width:74px;height:74px;margin:0 auto">
+                  <div style="position:absolute;inset:0;border-radius:50%;background:var(--green-500);opacity:0.25;animation:sc-ring 1.4s ease-out infinite"></div>
+                  <div style="position:absolute;inset:0;border-radius:50%;background:var(--green-500);display:flex;align-items:center;justify-content:center"><l-icon name="check" size="36" color="#ffffff" stroke-width="2.6"></l-icon></div>
+                </div>
+                <div style="font-family:var(--font-display);font-weight:800;font-size:21px;margin-top:14px">Order request sent</div>
+                <div style="font-size:13px;color:var(--text-muted);margin-top:6px;line-height:1.5">ORD-1152 · {{ cartTotalText }} · Sales will confirm on WhatsApp.<br>~{{ cartSpText }} SP credited on payment.</div>
+                <div onClick="{{ trackOrder }}" style-hover="filter:brightness(1.05)" style="margin-top:16px;background:var(--blue-600);color:#fff;border-radius:999px;padding:13px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:var(--shadow-brand)">Track in Orders</div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ======== REDEEM DIALOG ======== -->
+      <sc-if value="{{ redeemOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:55;background:rgba(11,27,46,0.6);display:flex;align-items:center;justify-content:center;animation:sc-fade-in 0.2s ease">
+          <div style="background:#fff;border-radius:22px;padding:22px 20px;width:290px;text-align:center;animation:sc-pop 0.3s ease">
+            <div style="width:50px;height:50px;border-radius:15px;background:var(--orange-50);display:flex;align-items:center;justify-content:center;margin:0 auto">
+              <l-icon name="{{ redeemIcon }}" size="24" color="#E0790C"></l-icon>
+            </div>
+            <div style="font-family:var(--font-display);font-weight:800;font-size:18px;margin-top:12px">{{ redeemName }}</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:6px">Redeem for <b style="color:var(--brand-accent-strong)">{{ redeemCost }}</b>? Balance after: {{ redeemAfter }} SP.</div>
+            <div style="display:flex;gap:9px;margin-top:16px">
+              <div onClick="{{ cancelRedeem }}" style-hover="background:var(--slate-100)" style="flex:1;border:1px solid var(--slate-300);border-radius:999px;padding:11px;font-weight:700;font-size:13.5px;cursor:pointer">Cancel</div>
+              <div onClick="{{ confirmRedeem }}" style-hover="filter:brightness(1.05)" style="flex:1;background:var(--grad-orange);color:#fff;border-radius:999px;padding:11px;font-weight:800;font-size:13.5px;cursor:pointer;box-shadow:var(--shadow-accent)">{{ t.redeem }}</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </x-import>
+
+  <!-- ============ DESIGNER NOTES ============ -->
+  <div style="width:320px;flex:none;display:flex;flex-direction:column;gap:14px">
+    <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:20px;box-shadow:var(--shadow-sm)">
+      <div style="font-family:var(--font-condensed);font-weight:700;letter-spacing:0.18em;text-transform:uppercase;font-size:11px;color:var(--brand-accent-strong)">Shakti Club · Dealer App v1</div>
+      <div style="font-family:var(--font-display);font-weight:800;font-size:20px;margin-top:5px;color:var(--text-strong)">Interactive prototype for dealer testing</div>
+      <div style="font-size:12.5px;color:var(--text-body);line-height:1.6;margin-top:10px">Persona: <b>Rajesh Gupta</b>, Gupta Furniture House, Ludhiana — Shakti Silver, ₹2L/month billing, ₹1.3L short of Gold (the aspiration moment). Data follows the blueprint's worked example. All 12 blueprint surfaces are in.</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:20px;box-shadow:var(--shadow-sm)">
+      <div style="font-weight:800;font-size:13.5px;color:var(--text-strong);margin-bottom:9px">Try in a test session</div>
+      <div style="font-size:12.5px;color:var(--text-body);line-height:1.9">· Watch the SP balance count up on load<br>· Tap <b>Scratch &amp; win</b> — rub the card with the mouse<br>· Catalogue → <b>Add to PO</b> → cart → send order<br>· <b>Scan QR</b> → simulate a carton scan (+5 SP)<br>· Leaderboard tabs: district ↔ state<br>· Rewards → redeem the ₹1,000 credit note<br>· <b>EN / हि / ਪਾ</b> chip in the header switches language</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:20px;box-shadow:var(--shadow-sm)">
+      <div style="font-weight:800;font-size:13.5px;color:var(--text-strong);margin-bottom:9px">Assumptions to confirm</div>
+      <div style="font-size:12.5px;color:var(--text-body);line-height:1.8">· Dealer pricing shown openly in-app<br>· Order = request routed to sales (MVP), not e-commerce checkout<br>· Tier maths uses blueprint placeholders (₹15L Gold)<br>· Punjabi dealer persona; contact details are dummies</div>
+      <div style="font-size:12.5px;color:var(--text-body);margin-top:12px">Office side: <a href="Shakti Admin Panel.dc.html" style="color:var(--text-link);font-weight:700">Admin web panel →</a></div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1300, &quot;height&quot;: 1000 },
+  &quot;lang&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;en&quot;, &quot;hi&quot;, &quot;pa&quot;], &quot;default&quot;: &quot;en&quot;, &quot;tsType&quot;: &quot;'en' | 'hi' | 'pa'&quot;, &quot;section&quot;: &quot;App&quot; },
+  &quot;startAtLogin&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;App&quot; },
+  &quot;festivalMode&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Gamification&quot; }
+}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      langOverride: null,
+      screen: null,
+      stack: [],
+      otpStage: false,
+      sp: 24380,
+      spShown: 0,
+      progressOn: false,
+      cart: {},
+      cartOpen: false,
+      orderPlaced: false,
+      cat: 'all',
+      scratchOpen: false,
+      scratchDone: false,
+      scratchUsed: false,
+      confettiOn: false,
+      toast: null,
+      lbTab: 'district',
+      scans: 42,
+      votedColor: null,
+      redeemItem: null,
+      historyExtra: [],
+    };
+    this._scratched = 0;
+    this._down = false;
+    this._last = null;
+  }
+
+  componentDidMount() {
+    this.countTo(this.state.sp, 1400);
+    setTimeout(() => this.setState({ progressOn: true }), 500);
+  }
+
+  componentWillUnmount() {
+    if (this._raf) cancelAnimationFrame(this._raf);
+    if (this._toastTimer) clearTimeout(this._toastTimer);
+  }
+
+  countTo(target, dur) {
+    if (this._raf) cancelAnimationFrame(this._raf);
+    const from = this.state.spShown;
+    const t0 = performance.now();
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - k, 3);
+      this.setState({ spShown: Math.round(from + (target - from) * e) });
+      if (k < 1) this._raf = requestAnimationFrame(step);
+    };
+    this._raf = requestAnimationFrame(step);
+  }
+
+  addSP(n) {
+    this.setState((s) => ({ sp: s.sp + n }), () => this.countTo(this.state.sp, 900));
+  }
+
+  showToast(title, sub) {
+    if (this._toastTimer) clearTimeout(this._toastTimer);
+    this.setState({ toast: { title, sub } });
+    this._toastTimer = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+
+  nav(screen) {
+    const cur = this.currentScreen();
+    this.setState((s) => ({ screen, stack: [...s.stack, cur] }), () => {
+      if (this._scrollEl) this._scrollEl.scrollTop = 0;
+    });
+  }
+
+  currentScreen() {
+    return this.state.screen ?? ((this.props.startAtLogin ?? false) ? 'login' : 'home');
+  }
+
+  lang() {
+    return this.state.langOverride ?? this.props.lang ?? 'en';
+  }
+
+  fmt(n) {
+    return n.toLocaleString('en-IN');
+  }
+
+  // ---- scratch card ----
+  initScratch(el) {
+    if (!el || el === this._scrEl) return;
+    this._scrEl = el;
+    this._scratched = 0;
+    const ctx = el.getContext('2d');
+    const g = ctx.createLinearGradient(0, 0, 264, 150);
+    g.addColorStop(0, '#D9DFE8');
+    g.addColorStop(0.5, '#B8C2CF');
+    g.addColorStop(1, '#9AA8B8');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 264, 150);
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = 1;
+    for (let i = -150; i < 264; i += 14) {
+      ctx.beginPath();
+      ctx.moveTo(i, 150);
+      ctx.lineTo(i + 150, 0);
+      ctx.stroke();
+    }
+    ctx.fillStyle = '#4C5969';
+    ctx.font = "700 15px 'Saira Condensed', sans-serif";
+    ctx.textAlign = 'center';
+    ctx.fillText('S C R A T C H   H E R E', 132, 72);
+    ctx.font = "600 10px 'Hanken Grotesk', sans-serif";
+    ctx.fillStyle = '#6B7A8C';
+    ctx.fillText('खरोंचो और जीतो', 132, 92);
+  }
+
+  scratchAt(e) {
+    const el = this._scrEl;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 264;
+    const y = ((e.clientY - rect.top) / rect.height) * 150;
+    const ctx = el.getContext('2d');
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, 22, 0, Math.PI * 2);
+    ctx.fill();
+    if (this._last) {
+      const dx = x - this._last.x, dy = y - this._last.y;
+      this._scratched += Math.sqrt(dx * dx + dy * dy);
+    } else {
+      this._scratched += 20;
+    }
+    this._last = { x, y };
+    if (this._scratched > 900 && !this.state.scratchDone) {
+      this.setState({ scratchDone: true, confettiOn: true });
+      this._confetti = this.makeConfetti();
+      setTimeout(() => this.setState({ confettiOn: false }), 2600);
+    }
+  }
+
+  makeConfetti() {
+    const colors = ['#F7941D', '#FFBA1F', '#0E63D6', '#5EA1FB', '#1E9E5A', '#FFD68C'];
+    return Array.from({ length: 28 }, (_, i) => ({
+      left: Math.random() * 100,
+      delay: Math.random() * 0.5,
+      dur: 1.4 + Math.random() * 1.1,
+      size: 6 + Math.random() * 7,
+      color: colors[i % colors.length],
+      round: Math.random() > 0.5,
+    }));
+  }
+
+  renderVals() {
+    const s = this.state;
+    const lang = this.lang();
+    const screen = this.currentScreen();
+    const fmt = (n) => this.fmt(n);
+
+    const T = {
+      en: { home: 'Home', shop: 'Catalogue', rewards: 'Rewards', ledger: 'Ledger', more: 'More', hello: 'Namaste, Rajesh ji', balance: 'Shakti Points', worth: 'value', toGold: 'to Shakti Gold', missions: 'Live missions', scratchTitle: 'Scratch & win', quick: 'Quick actions', order: 'Order', scan: 'Scan QR', rank: 'Your district rank', viewBoard: 'View', addPO: 'Add to PO', sendOrder: 'Send order request', payNudge: 'Pay before 10 Jul → +25% bonus SP', redeem: 'Redeem', earnLine: 'The more Shakti you sell, the more Shakti you earn.' },
+      hi: { home: 'होम', shop: 'कैटलॉग', rewards: 'इनाम', ledger: 'खाता', more: 'और', hello: 'नमस्ते, राजेश जी', balance: 'शक्ति पॉइंट्स', worth: 'मूल्य', toGold: 'शक्ति गोल्ड तक', missions: 'चालू मिशन', scratchTitle: 'खरोंचो और जीतो', quick: 'क्विक एक्शन', order: 'ऑर्डर', scan: 'QR स्कैन', rank: 'आपकी ज़िला रैंक', viewBoard: 'देखें', addPO: 'PO में जोड़ें', sendOrder: 'ऑर्डर भेजें', redeem: 'रिडीम करें', payNudge: '10 जुलाई से पहले भुगतान → +25% बोनस SP', earnLine: 'जितना शक्ति बेचोगे, उतनी शक्ति कमाओगे।' },
+      pa: { home: 'ਹੋਮ', shop: 'ਕੈਟਾਲਾਗ', rewards: 'ਇਨਾਮ', ledger: 'ਖਾਤਾ', more: 'ਹੋਰ', hello: 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ, ਰਾਜੇਸ਼ ਜੀ', balance: 'ਸ਼ਕਤੀ ਪੁਆਇੰਟ', worth: 'ਮੁੱਲ', toGold: 'ਸ਼ਕਤੀ ਗੋਲਡ ਤੱਕ', missions: 'ਚਾਲੂ ਮਿਸ਼ਨ', scratchTitle: 'ਖੁਰਚੋ ਤੇ ਜਿੱਤੋ', quick: 'ਤੁਰੰਤ ਐਕਸ਼ਨ', order: 'ਆਰਡਰ', scan: 'QR ਸਕੈਨ', rank: 'ਤੁਹਾਡਾ ਜ਼ਿਲ੍ਹਾ ਰੈਂਕ', viewBoard: 'ਵੇਖੋ', addPO: 'PO ਵਿੱਚ ਪਾਓ', sendOrder: 'ਆਰਡਰ ਭੇਜੋ', redeem: 'ਰਿਡੀਮ', payNudge: '10 ਜੁਲਾਈ ਤੋਂ ਪਹਿਲਾਂ ਭੁਗਤਾਨ → +25% ਬੋਨਸ SP', earnLine: 'ਜਿੰਨੀ ਸ਼ਕਤੀ ਵੇਚੋਗੇ, ਓਨੀ ਸ਼ਕਤੀ ਕਮਾਓਗੇ।' },
+    };
+    const t = T[lang];
+    const langChips = { en: 'EN', hi: 'हि', pa: 'ਪਾ' };
+
+    // ---- products ----
+    const PRODUCTS = [
+      { id: 'maharaja', code: 'SGF-8855', name: 'Maharaja Tufted Armchair', img: 'dsc09058', dealer: 812, mrp: 1399, carton: 4, moq: 8, tag: 'Hero', cat: 'arm' },
+      { id: 'royal', code: 'SGF-8820', name: 'Royal Executive Armchair', img: 'dsc09078', dealer: 745, mrp: 1249, carton: 4, moq: 8, cat: 'arm' },
+      { id: 'rattan', code: 'SGF-8812', name: 'Rattan Weave Armchair', img: 'dsc09079', dealer: 698, mrp: 1149, carton: 4, moq: 8, cat: 'arm' },
+      { id: 'palm', code: 'SGF-8806', name: 'Palm High-Back Armchair', img: 'dsc09060', dealer: 645, mrp: 1049, carton: 6, moq: 12, cat: 'arm' },
+      { id: 'sonet', code: 'SGF-4410', name: 'Sonet Armless Chair', img: 'dsc09044', dealer: 338, mrp: 579, carton: 8, moq: 16, cat: 'chair' },
+      { id: 'heritage', code: 'SGF-9901', name: 'Heritage Storage Stool', img: 'dsc09048', dealer: 960, mrp: 1599, carton: 4, moq: 4, tag: '2× SP', cat: 'stool' },
+    ];
+    const catDefs = [['all', 'All models'], ['arm', 'Armchairs'], ['chair', 'Chairs'], ['stool', 'Stools']];
+    const cats = catDefs.map(([id, label]) => {
+      const on = s.cat === id;
+      return {
+        label, set: () => this.setState({ cat: id }),
+        weight: on ? 700 : 600,
+        bg: on ? 'var(--blue-600)' : '#fff',
+        color: on ? '#fff' : 'var(--slate-600)',
+        border: on ? 'var(--blue-600)' : 'var(--slate-200)',
+      };
+    });
+
+    const products = PRODUCTS.filter((p) => s.cat === 'all' || p.cat === s.cat).map((p) => {
+      const qty = s.cart[p.id] || 0;
+      const spPer = Math.round((p.dealer / 100) * 1.1 * (p.id === 'heritage' ? 2 : 1) * 10) / 10;
+      return {
+        ...p,
+        imgSrc: 'assets/products/' + p.img + '.jpg',
+        dealerText: '₹' + fmt(p.dealer),
+        mrpText: '₹' + fmt(p.mrp),
+        marginText: '₹' + fmt(p.mrp - p.dealer) + ' margin',
+        spNote: p.id === 'heritage' ? 'Earns ' + spPer + ' SP/pc · 2× live' : 'Earns ~' + spPer + ' SP/pc',
+        qtyLabel: qty + ' pcs',
+        inCart: qty > 0,
+        notInCart: qty === 0,
+        inc: () => {
+          this.setState((st) => ({ cart: { ...st.cart, [p.id]: (st.cart[p.id] || 0) + p.carton } }));
+        },
+        dec: () => {
+          this.setState((st) => {
+            const q = Math.max(0, (st.cart[p.id] || 0) - p.carton);
+            const cart = { ...st.cart };
+            if (q === 0) delete cart[p.id]; else cart[p.id] = q;
+            return { cart };
+          });
+        },
+      };
+    });
+
+    const cartIds = Object.keys(s.cart);
+    const cartLines = cartIds.map((id) => {
+      const p = PRODUCTS.find((x) => x.id === id);
+      const qty = s.cart[id];
+      return {
+        name: p.name,
+        imgSrc: 'assets/products/' + p.img + '.jpg',
+        qtyLabel: qty + ' pcs',
+        priceText: '₹' + fmt(p.dealer),
+        lineTotal: '₹' + fmt(qty * p.dealer),
+      };
+    });
+    const cartTotal = cartIds.reduce((a, id) => a + s.cart[id] * PRODUCTS.find((x) => x.id === id).dealer, 0);
+    const cartCount = cartIds.reduce((a, id) => a + s.cart[id], 0);
+    const cartSp = Math.floor((cartTotal / 100) * 1.1);
+
+    // ---- missions ----
+    const missions = [
+      { icon: 'rocket', title: 'New launch: Heritage Stool', sub: '2× SP on SGF-9901 till 31 Jul', reward: '2× SP', hasProgress: true, pctW: s.progressOn ? '32%' : '2%', progressLabel: '64 of 200 units', deadline: '25 days left' },
+      { icon: 'wallet', title: 'Clear INV-2262 before the 10th', sub: 'Early payment on ₹86,400', reward: '+540 SP', hasProgress: false },
+      { icon: 'camera', title: 'Display photo of the month', sub: 'Your SGF corner, one photo', reward: '+100 SP', hasProgress: false },
+    ];
+
+    const quickActions = [
+      { icon: 'shopping-cart', label: t.order, go: () => this.nav('shop') },
+      { icon: 'qr-code', label: t.scan, go: () => this.nav('scan') },
+      { icon: 'gift', label: t.rewards, go: () => this.nav('rewards') },
+      { icon: 'wallet', label: t.ledger, go: () => this.nav('ledger') },
+    ];
+
+    // ---- rewards ----
+    const mkReward = (icon, name, sub, cost, group) => ({ icon, name, sub, cost, group });
+    const rewardsRaw = [
+      mkReward('receipt-indian-rupee', '₹500 credit note', 'Auto-applies to next invoice', 2000, 0),
+      mkReward('receipt-indian-rupee', '₹1,000 credit note', 'Auto-applies to next invoice', 4000, 0),
+      mkReward('receipt-indian-rupee', '₹5,000 credit note', 'Auto-applies to next invoice', 20000, 0),
+      mkReward('calendar-plus', 'Extra 7 credit days', 'One invoice of your choice', 1500, 1),
+      mkReward('truck', 'Priority dispatch token', 'Jump the queue once', 2500, 1),
+      mkReward('sticker', 'Branding pack — 50 stickers', 'Shop + product stickers', 1800, 1),
+      mkReward('lamp', 'Glow sign board', '3×2 ft, installed', 9500, 2),
+      mkReward('coins', 'Silver coin — 5g', '999 purity, gift boxed', 14500, 2),
+      mkReward('watch', 'Smartwatch', 'Fulfilled in 14 days', 9200, 2),
+    ];
+    const groupDefs = [
+      { label: 'Credit notes', note: 'most popular' },
+      { label: 'Business boosters', note: 'run the shop better' },
+      { label: 'Shop assets & lifestyle', note: 'fulfilled in 14 days' },
+    ];
+    const rewardGroups = groupDefs.map((g, gi) => ({
+      ...g,
+      items: rewardsRaw.filter((r) => r.group === gi).map((r) => {
+        const afford = s.sp >= r.cost;
+        return {
+          ...r,
+          tileBg: gi === 0 ? 'var(--orange-50)' : gi === 1 ? 'var(--blue-50)' : 'var(--cream-100)',
+          tileColor: gi === 0 ? '#E0790C' : gi === 1 ? '#0A52B4' : '#8E4A0C',
+          spText: fmt(r.cost) + ' SP',
+          btnLabel: afford ? t.redeem : 'Locked',
+          cursor: afford ? 'pointer' : 'default',
+          btnBg: afford ? 'var(--grad-orange)' : 'var(--slate-100)',
+          btnColor: afford ? '#fff' : 'var(--slate-400)',
+          btnShadow: afford ? 'var(--shadow-accent)' : 'none',
+          redeem: () => { if (afford) this.setState({ redeemItem: r }); },
+        };
+      }),
+    }));
+
+    const history = [
+      ...s.historyExtra,
+      { icon: 'receipt-indian-rupee', text: '₹1,000 credit note — applied to INV-2231', date: '02 Jun' },
+      { icon: 'sticker', text: 'Branding pack — delivered', date: '14 May' },
+    ];
+
+    // ---- ledger ----
+    const invoices = [
+      { no: 'INV-2262', date: '28 Jun', sub: 'Due 10 Jul · pay early for +540 SP', amount: '₹86,400', status: 'Unpaid', chipBg: 'var(--amber-50)', chipColor: 'var(--amber-600)' },
+      { no: 'INV-2231', date: '14 Jun', sub: 'Paid on time · +706 SP credited', amount: '₹64,200', status: 'Paid', chipBg: 'var(--green-50)', chipColor: 'var(--green-600)' },
+      { no: 'INV-2204', date: '02 Jun', sub: 'Paid on time · +575 SP credited', amount: '₹52,300', status: 'Paid', chipBg: 'var(--green-50)', chipColor: 'var(--green-600)' },
+      { no: 'INV-2188', date: '19 May', sub: 'Paid early · +1,196 SP incl. bonus', amount: '₹1,08,750', status: 'Paid', chipBg: 'var(--green-50)', chipColor: 'var(--green-600)' },
+    ];
+
+    // ---- leaderboard ----
+    const district = [
+      { rank: 1, name: 'Bansal Furniture', city: 'Khanna', sp: 4820 },
+      { rank: 2, name: 'New Punjab Traders', city: 'Ludhiana', sp: 4410 },
+      { rank: 3, name: 'Sethi & Sons', city: 'Jagraon', sp: 3820 },
+      { rank: 4, name: 'Gupta Furniture House', city: 'Ludhiana · you', sp: 3450, you: true },
+      { rank: 5, name: 'Mittal Agencies', city: 'Samrala', sp: 3120 },
+      { rank: 6, name: 'Kalsi Home Store', city: 'Raikot', sp: 2870 },
+    ];
+    const state = [
+      { rank: 1, name: 'Amritsar Furniture Mart', city: 'Amritsar', sp: 6240 },
+      { rank: 2, name: 'Doaba Traders', city: 'Jalandhar', sp: 5910 },
+      { rank: 3, name: 'Bansal Furniture', city: 'Khanna', sp: 4820 },
+      { rank: 4, name: 'Patiala Home Needs', city: 'Patiala', sp: 4650 },
+      { rank: 5, name: 'New Punjab Traders', city: 'Ludhiana', sp: 4410 },
+      { rank: 23, name: 'Gupta Furniture House', city: 'Ludhiana · you', sp: 3450, you: true },
+    ];
+    const lbRows = (s.lbTab === 'district' ? district : state).map((r) => ({
+      ...r,
+      sp: fmt(r.sp),
+      bg: r.you ? 'var(--blue-600)' : '#fff',
+      border: r.you ? 'var(--blue-600)' : 'var(--slate-200)',
+      shadow: r.you ? 'var(--shadow-brand)' : 'none',
+      rankBg: r.you ? 'rgba(255,255,255,0.18)' : r.rank <= 3 ? 'var(--orange-50)' : 'var(--slate-100)',
+      rankColor: r.you ? '#fff' : r.rank <= 3 ? 'var(--brand-accent-strong)' : 'var(--slate-500)',
+      nameColor: r.you ? '#fff' : 'var(--text-strong)',
+      subColor: r.you ? 'rgba(255,255,255,0.72)' : 'var(--text-muted)',
+      spColor: r.you ? '#FFD68C' : 'var(--text-strong)',
+    }));
+    const lbOn = (on) => ({
+      bg: on ? '#fff' : 'transparent',
+      color: on ? 'var(--brand-primary)' : 'var(--slate-500)',
+      shadow: on ? 'var(--shadow-sm)' : 'none',
+    });
+    const dOn = lbOn(s.lbTab === 'district');
+    const stOn = lbOn(s.lbTab === 'state');
+
+    const badges = [
+      { icon: 'package-check', name: 'First Order', sub: 'May 2025', earned: true },
+      { icon: 'qr-code', name: 'Pehla Scan', sub: 'Jun 2025', earned: true },
+      { icon: 'flame', name: 'Streak Veteran', sub: '6-month streak', earned: true },
+      { icon: 'sparkles', name: 'Festival Hero', sub: 'Diwali 2025', earned: true },
+      { icon: 'truck', name: 'Truck Master', sub: 'First full truck', earned: false },
+      { icon: 'crown', name: '8855 Champion', sub: '100+ Maharaja units', earned: false },
+      { icon: 'users', name: 'Referral Star', sub: '3 referrals', earned: false },
+      { icon: 'gem', name: 'Jackpot Winner', sub: '2,000 SP scratch', earned: false },
+      { icon: 'trophy', name: 'District Champion', sub: 'Win a month', earned: false },
+    ].map((b) => ({
+      ...b,
+      opacity: b.earned ? 1 : 0.45,
+      tileBg: b.earned ? 'var(--orange-50)' : 'var(--slate-100)',
+      iconColor: b.earned ? '#E0790C' : '#9AA8B8',
+    }));
+
+    // ---- orders ----
+    const stepDefs = [
+      { icon: 'check', title: 'Confirmed', sub: '02 Jul · by Suresh (sales)', state: 'done' },
+      { icon: 'check', title: 'Packed', sub: '03 Jul · 78 cartons, QR serialised', state: 'done' },
+      { icon: 'truck', title: 'Dispatched', sub: 'PB-10-AT-4483 · LR 88231 · ETA Tue', state: 'current' },
+      { icon: 'package', title: 'Delivered', sub: 'Scan cartons on arrival → +SP', state: 'todo' },
+    ];
+    const orderSteps = stepDefs.map((st, i) => ({
+      ...st,
+      hasLine: i < stepDefs.length - 1,
+      dotBg: st.state === 'done' ? 'var(--green-500)' : st.state === 'current' ? 'var(--blue-600)' : '#fff',
+      dotBorder: st.state === 'done' ? 'var(--green-500)' : st.state === 'current' ? 'var(--blue-600)' : 'var(--slate-300)',
+      iconColor: st.state === 'todo' ? '#9AA8B8' : '#ffffff',
+      lineBg: st.state === 'done' ? 'var(--green-500)' : 'var(--slate-200)',
+      titleColor: st.state === 'todo' ? 'var(--text-muted)' : 'var(--text-strong)',
+    }));
+    const pastOrders = [
+      { no: 'ORD-1131', date: '14 Jun', sub: '280 pcs · ₹1,86,300 · delivered', sp: '+706 SP' },
+      { no: 'ORD-1118', date: '02 Jun', sub: '224 pcs · ₹1,52,600 · delivered', sp: '+575 SP' },
+      { no: 'ORD-1102', date: '19 May', sub: '390 pcs · ₹2,64,200 · full truck', sp: '+1,196 SP' },
+    ];
+
+    // ---- media ----
+    const mediaItems = [
+      { name: 'Maharaja poster', sub: 'A3 print + story size', img: 'dsc09058' },
+      { name: 'Strength demo reel', sub: '150 kg load test · 22 sec', img: 'dsc09043' },
+      { name: 'Monsoon offer post', sub: 'WhatsApp status size', img: 'dsc09053' },
+      { name: 'Trade price list', sub: 'PDF · July 2026', img: 'dsc09078' },
+    ].map((mi) => ({
+      ...mi,
+      imgSrc: 'assets/products/' + mi.img + '.jpg',
+      send: () => this.showToast('Sent to WhatsApp', mi.name + ' · stamped with your shop details'),
+    }));
+
+    // ---- notifications ----
+    const notifs = [
+      { icon: 'coins', title: '+706 SP credited', sub: 'INV-2231 reconciled as paid. Scratch card unlocked.', time: '2h', tileBg: 'var(--orange-50)', iconColor: '#E0790C' },
+      { icon: 'truck', title: 'ORD-1147 dispatched', sub: 'Truck PB-10-AT-4483 · LR 88231 · ETA Tuesday.', time: '5h', tileBg: 'var(--blue-50)', iconColor: '#0A52B4' },
+      { icon: 'timer', title: 'Mission ends in 25 days', sub: 'Heritage Stool 2× SP — 64 of 200 units done.', time: '1d', tileBg: 'var(--blue-50)', iconColor: '#0A52B4' },
+      { icon: 'alarm-clock', title: '1,150 SP expire 31 Aug', sub: 'Redeem before expiry — a ₹500 credit note is 2,000 SP.', time: '2d', tileBg: 'var(--amber-50)', iconColor: '#C9821A' },
+      { icon: 'trophy', title: 'You moved to #4 in Ludhiana', sub: '370 SP behind Sethi & Sons. One order changes it.', time: '3d', tileBg: 'var(--green-50)', iconColor: '#168049' },
+    ];
+
+    // ---- more ----
+    const tierRows = [
+      { label: 'SP multiplier', silver: '1.1×', gold: '1.2×' },
+      { label: 'Dispatch', silver: 'Standard', gold: 'Priority queue' },
+      { label: 'Credit days', silver: '+7 days', gold: '+15 days' },
+      { label: 'Designs', silver: '—', gold: 'Early access' },
+      { label: 'Annual reward', silver: 'Diwali gift+', gold: 'Factory visit + founder dinner' },
+    ];
+    const moreMenu = [
+      { icon: 'trophy', label: 'Leaderboard & badges', go: () => this.nav('leaderboard') },
+      { icon: 'package', label: 'Orders & tracking', go: () => this.nav('orders') },
+      { icon: 'qr-code', label: 'Scan cartons', go: () => this.nav('scan') },
+      { icon: 'megaphone', label: 'Shakti Media Kit', go: () => this.nav('media') },
+      { icon: 'life-buoy', label: 'Support & warranty', go: () => this.nav('support') },
+      { icon: 'bell', label: 'Notifications', go: () => this.nav('notifs') },
+    ];
+
+    const langs = ['en', 'hi', 'pa'].map((code) => {
+      const on = lang === code;
+      const labels = { en: 'English', hi: 'हिन्दी', pa: 'ਪੰਜਾਬੀ' };
+      return {
+        label: labels[code],
+        set: () => this.setState({ langOverride: code }),
+        weight: on ? 700 : 500,
+        bg: on ? 'var(--blue-600)' : '#fff',
+        color: on ? '#fff' : 'var(--slate-600)',
+        border: on ? 'var(--blue-600)' : 'var(--slate-300)',
+      };
+    });
+
+    // ---- nav ----
+    const navDefs = [
+      ['home', 'home', t.home],
+      ['shop', 'armchair', t.shop],
+      ['rewards', 'gift', t.rewards],
+      ['ledger', 'wallet', t.ledger],
+      ['more', 'menu', t.more],
+    ];
+    const subToTab = { leaderboard: 'home', scan: 'home', orders: 'home', media: 'more', support: 'more', notifs: 'home' };
+    const activeTab = subToTab[screen] || screen;
+    const navItems = navDefs.map(([id, icon, label]) => {
+      const on = activeTab === id;
+      return {
+        icon, label,
+        go: () => this.setState({ screen: id, stack: [] }, () => { if (this._scrollEl) this._scrollEl.scrollTop = 0; }),
+        color: on ? 'var(--blue-700)' : '#9AA8B8',
+        weight: on ? 800 : 500,
+        stroke: on ? 2.4 : 2,
+        indicatorBg: on ? 'var(--orange-500)' : 'transparent',
+      };
+    });
+
+    // ---- poll ----
+    const pollDefs = [['maroon', '#7A1F2B', 'Maroon'], ['leaf', '#3E9B4F', 'Leaf'], ['teal', '#128A86', 'Teal'], ['marigold', '#F4A81D', 'Marigold']];
+    const pollColors = pollDefs.map(([id, hex, label]) => ({
+      hex, label,
+      pick: () => { this.setState({ votedColor: id }); this.showToast('Vote counted', label + ' — results in the monthly Bulletin'); },
+      ring: s.votedColor === id ? '0 0 0 3px #fff, 0 0 0 5px var(--blue-600)' : '0 0 0 1px var(--slate-300)',
+    }));
+
+    // ---- confetti ----
+    let confettiEl = null;
+    if (s.confettiOn && this._confetti) {
+      confettiEl = React.createElement(
+        'div',
+        { style: { position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 5 } },
+        this._confetti.map((c, i) =>
+          React.createElement('span', {
+            key: i,
+            style: {
+              position: 'absolute', top: '18%', left: c.left + '%',
+              width: c.size, height: c.size * (c.round ? 1 : 0.55),
+              borderRadius: c.round ? '50%' : 2,
+              background: c.color,
+              animation: 'sc-confetti ' + c.dur + 's ease-in ' + c.delay + 's forwards',
+              opacity: 0,
+            },
+          })
+        )
+      );
+    }
+
+    const r = s.redeemItem;
+
+    return {
+      t,
+      langChip: langChips[lang],
+      cycleLang: () => {
+        const order = ['en', 'hi', 'pa'];
+        this.setState({ langOverride: order[(order.indexOf(lang) + 1) % 3] });
+      },
+      langs,
+      festivalMode: this.props.festivalMode ?? false,
+
+      // screens
+      isLogin: screen === 'login',
+      notLogin: screen !== 'login',
+      isHome: screen === 'home',
+      isShop: screen === 'shop',
+      isRewards: screen === 'rewards',
+      isLedger: screen === 'ledger',
+      isLeaderboard: screen === 'leaderboard',
+      isScan: screen === 'scan',
+      isOrders: screen === 'orders',
+      isMedia: screen === 'media',
+      isSupport: screen === 'support',
+      isNotifs: screen === 'notifs',
+      isMore: screen === 'more',
+
+      goBack: () => {
+        this.setState((st) => {
+          const stack = [...st.stack];
+          const prev = stack.pop() || 'home';
+          return { screen: prev, stack };
+        });
+      },
+      goNotifs: () => this.nav('notifs'),
+      goLeaderboard: () => this.nav('leaderboard'),
+      goScan: () => this.nav('scan'),
+      logout: () => this.setState({ screen: 'login', stack: [], otpStage: false }),
+
+      // login
+      otpStage: s.otpStage,
+      notOtpStage: !s.otpStage,
+      getOtp: () => this.setState({ otpStage: true }),
+      verifyOtp: () => {
+        this.setState({ screen: 'home', stack: [], otpStage: false, spShown: 0, progressOn: false });
+        setTimeout(() => { this.countTo(this.state.sp, 1400); this.setState({ progressOn: true }); }, 350);
+        this.showToast('Welcome back, Rajesh ji', 'Shakti Silver · 1.1× SP on every paid invoice');
+      },
+
+      // hero
+      spText: fmt(s.spShown),
+      spWorth: '₹' + fmt(Math.round(s.sp * 0.25)),
+      progressW: s.progressOn ? '91%' : '2%',
+      scratchShelfSub: s.scratchUsed ? 'Next card on your next paid invoice' : '1 card waiting · expires in 72 hrs',
+
+      missions,
+      quickActions,
+
+      // shop
+      cats,
+      products,
+      pollColors,
+      voted: !!s.votedColor,
+
+      // cart
+      showFab: cartCount > 0 && !s.cartOpen && (screen === 'shop' || screen === 'home'),
+      cartCountLabel: cartCount + ' pcs',
+      cartTotalText: '₹' + fmt(cartTotal),
+      cartSpText: fmt(cartSp),
+      cartLines,
+      cartOpen: s.cartOpen,
+      openCart: () => this.setState({ cartOpen: true }),
+      closeCart: () => this.setState({ cartOpen: false, orderPlaced: false }),
+      orderPlaced: s.orderPlaced,
+      notOrderPlaced: !s.orderPlaced,
+      placeOrder: () => this.setState({ orderPlaced: true }),
+      trackOrder: () => {
+        this.setState({ cartOpen: false, orderPlaced: false, cart: {} });
+        this.nav('orders');
+      },
+
+      // rewards
+      rewardGroups,
+      history,
+      redeemOpen: !!r,
+      redeemName: r ? r.name : '',
+      redeemIcon: r ? r.icon : 'gift',
+      redeemCost: r ? fmt(r.cost) + ' SP' : '',
+      redeemAfter: r ? fmt(s.sp - r.cost) : '',
+      cancelRedeem: () => this.setState({ redeemItem: null }),
+      confirmRedeem: () => {
+        const item = s.redeemItem;
+        if (!item) return;
+        this.setState(
+          (st) => ({
+            sp: st.sp - item.cost,
+            redeemItem: null,
+            historyExtra: [{ icon: item.icon, text: item.name + ' — processing', date: 'Today' }, ...st.historyExtra],
+          }),
+          () => this.countTo(this.state.sp, 900)
+        );
+        this.showToast('Redeemed: ' + item.name, 'Fulfilled within 14 days · see history');
+      },
+
+      // ledger
+      invoices,
+
+      // leaderboard
+      lbRows,
+      lbDistrict: () => this.setState({ lbTab: 'district' }),
+      lbState: () => this.setState({ lbTab: 'state' }),
+      lbDistrictBg: dOn.bg, lbDistrictColor: dOn.color, lbDistrictShadow: dOn.shadow,
+      lbStateBg: stOn.bg, lbStateColor: stOn.color, lbStateShadow: stOn.shadow,
+      badges,
+      shareCard: () => this.showToast('Champion card ready', 'Shared image: "#4 in Ludhiana — Shakti Club" with your shop name'),
+
+      // scan
+      scanCountText: s.scans,
+      scanPctW: Math.round((s.scans / 130) * 100) + '%',
+      simulateScan: () => {
+        if (s.scans >= 130) { this.showToast('All cartons verified', 'INV-2231 fully scanned'); return; }
+        this.setState((st) => ({ scans: st.scans + 1 }));
+        this.addSP(5);
+        this.showToast('+5 SP · Carton verified', 'QR matched to INV-2231 · geo-tagged Ludhiana');
+      },
+
+      // orders
+      orderSteps,
+      pastOrders,
+
+      // media
+      mediaItems,
+
+      // support
+      newTicket: () => this.showToast('Complaint form', 'Photo upload + model picker — full flow in build phase'),
+
+      // notifications
+      notifs,
+
+      // more
+      tierRows,
+      moreMenu,
+
+      // toast
+      toastOn: !!s.toast,
+      toastTitle: s.toast ? s.toast.title : '',
+      toastSub: s.toast ? s.toast.sub : '',
+
+      // scratch
+      scratchOpen: s.scratchOpen,
+      scratchDone: s.scratchDone,
+      scratchNotDone: !s.scratchDone,
+      scratchCanvasOpacity: s.scratchDone ? 0 : 1,
+      openScratch: () => {
+        this._scrEl = null;
+        this._scratched = 0;
+        this._last = null;
+        this.setState({ scratchOpen: true, scratchDone: false });
+      },
+      closeScratch: () => this.setState({ scratchOpen: false }),
+      collectScratch: () => {
+        this.addSP(250);
+        this.setState({ scratchOpen: false, scratchUsed: true });
+        this.showToast('+250 SP collected', 'Scratch card · INV-2231 · balance updated');
+      },
+      scratchRef: (el) => this.initScratch(el),
+      scratchDown: (e) => { this._down = true; this._last = null; e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId); this.scratchAt(e); },
+      scratchMove: (e) => { if (this._down) this.scratchAt(e); },
+      scratchUp: () => { this._down = false; this._last = null; },
+
+      confettiEl,
+      navItems,
+      scrollRef: (el) => { this._scrollEl = el; },
+    };
+  }
+}
+
+</script>
+</body>
+</html>
