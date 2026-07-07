@@ -73,6 +73,44 @@ public/assets/    logos + product photos from the handoff bundle
 scripts/smoke.mjs Playwright smoke test (screenshots every major flow)
 ```
 
+## Native apps (Capacitor)
+
+The project is wrapped with [Capacitor](https://capacitorjs.com) so the same
+codebase ships as a native iOS/Android app **and** keeps working as a plain web
+app (`npm run dev` / `npm run build` are unchanged; Capacitor only reads `dist/`).
+
+```bash
+npm run cap:sync       # build web assets + copy into ios/ and android/
+npm run cap:ios        # …then open the Xcode project   (needs macOS + Xcode)
+npm run cap:android    # …then open in Android Studio
+```
+
+- Config: `capacitor.config.ts` — appId `com.sgfshakti.shakticlub`, webDir `dist`.
+- Platform projects live in `ios/` and `android/` (committed; regenerate with
+  `npx cap add <platform>` if ever deleted).
+
+### Native permissions
+
+Already configured in this repo:
+
+| Feature | Android (`AndroidManifest.xml`) | iOS (`Info.plist`) |
+|---|---|---|
+| QR carton scanner | `CAMERA` permission + optional `android.hardware.camera` feature | `NSCameraUsageDescription` |
+| Push notifications | `POST_NOTIFICATIONS` (runtime prompt on Android 13+) | — (needs Xcode capability, see below) |
+
+Still required when you wire up the real features:
+
+- **QR scanning**: install a scanner plugin (e.g. `@capacitor-mlkit/barcode-scanning`
+  or `@capacitor/camera`) and request the camera permission at runtime the first
+  time the dealer opens Scan.
+- **Push — iOS**: install `@capacitor/push-notifications`; in Xcode add the
+  **Push Notifications** capability (creates the `aps-environment` entitlement)
+  and optionally **Background Modes → Remote notifications**; upload an APNs key
+  to your push provider (FCM works for both platforms).
+- **Push — Android**: install `@capacitor/push-notifications`; add your Firebase
+  project's `google-services.json` to `android/app/`. Permission is only prompted
+  at runtime on Android 13+ (the manifest entry is already in place).
+
 ## Notes / assumptions (from the design's notes card)
 
 - Persona: Rajesh Gupta, Gupta Furniture House, Ludhiana — Shakti Silver,
