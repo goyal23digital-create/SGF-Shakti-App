@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Icon } from '../lib/icons';
+import { logoMark, logoMarkWhite } from '../assets';
 import {
   ACTIVITY,
   BREACH_ALERT,
@@ -116,7 +117,7 @@ export default function AdminPanel() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '18px 18px 16px', borderBottom: `1px solid ${sb.divider}` }}>
-          <img src={ink ? 'assets/logo-mark-white.png' : 'assets/logo-mark.png'} alt="" style={{ width: 34, height: 34, objectFit: 'contain', borderRadius: 9 }} />
+          <img src={ink ? logoMarkWhite : logoMark} alt="" style={{ width: 34, height: 34, objectFit: 'contain', borderRadius: 9 }} />
           <div>
             <div style={{ ...condensed, letterSpacing: '0.16em', fontSize: 11, color: sb.eyebrow }}>Shakti Club</div>
             <div style={{ fontSize: 11.5, color: sb.muted }}>Admin · Head Office</div>

@@ -69,9 +69,18 @@ src/
   app/            dealer app: store (state/actions), i18n, mock data,
                   shared components, screens
   admin/          admin panel + its mock data
-public/assets/    logos + product photos from the handoff bundle
+  assets/         logos + product photos (bundled/inlined by Vite)
 scripts/smoke.mjs Playwright smoke test (screenshots every major flow)
 ```
+
+## Single-file deploy build
+
+`npx vite build --config vite.artifact.config.ts` produces `dist-artifact/artifact.html`
+— the whole app (JS, CSS, images, and latin-subset brand fonts) inlined into one
+self-contained HTML file, for hosts that only accept a single page or block
+external requests. The normal `dist/` build is unaffected. Currently deployed at
+https://claude.ai/code/artifact/1b3c6c4d-fc2e-43f8-b4b3-6611d21c559e
+(admin panel: append `#/admin`).
 
 ## Native apps (Capacitor)
 

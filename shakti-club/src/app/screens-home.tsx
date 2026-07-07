@@ -1,4 +1,5 @@
 import { Icon } from '../lib/icons';
+import { logoMark, logoMarkWhite } from '../assets';
 import { fmt } from '../lib/format';
 import { LANG_CHIPS, LANG_LABELS, LANG_ORDER } from './i18n';
 import { useApp } from './store';
@@ -63,7 +64,7 @@ export function LoginScreen() {
         <LangPills />
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 30px', textAlign: 'center' }}>
-        <img src="assets/logo-mark.png" alt="SGF Shakti" style={{ width: 84, height: 84, objectFit: 'contain', borderRadius: 22, boxShadow: 'var(--shadow-md)' }} />
+        <img src={logoMark} alt="SGF Shakti" style={{ width: 84, height: 84, objectFit: 'contain', borderRadius: 22, boxShadow: 'var(--shadow-md)' }} />
         <div style={{ ...eyebrow, letterSpacing: '0.24em', fontSize: 13, color: 'var(--brand-accent-strong)', marginTop: 20 }}>SGF Shakti Partner App</div>
         <div style={{ ...display, fontSize: 40, lineHeight: 1.05, letterSpacing: '-0.01em', marginTop: 6 }}>Shakti Club</div>
         <div style={{ fontSize: 14.5, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.5 }}>{app.t.earnLine}</div>
@@ -158,7 +159,7 @@ export function HomeScreen() {
     <div>
       {/* header */}
       <div style={{ background: '#fff', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid var(--slate-100)' }}>
-        <img src="assets/logo-mark.png" alt="" style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 9 }} />
+        <img src={logoMark} alt="" style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 9 }} />
         <div style={{ flex: 1 }}>
           <div style={{ ...eyebrow, fontSize: 11, color: 'var(--brand-accent-strong)' }}>Shakti Club</div>
           <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 1 }}>Gupta Furniture House · Ludhiana</div>
@@ -254,7 +255,7 @@ export function HomeScreen() {
           <span style={{ ...eyebrow, fontSize: 11.5, background: 'rgba(255,255,255,0.16)', borderRadius: 999, padding: '4px 11px' }}>Shakti Silver</span>
           <span style={{ fontSize: 11, fontWeight: 700, background: 'rgba(255,186,31,0.22)', color: '#FFD68C', borderRadius: 999, padding: '4px 9px' }}>1.1× SP</span>
           <div style={{ flex: 1 }} />
-          <img src="assets/logo-mark-white.png" alt="" style={{ height: 22, opacity: 0.9 }} />
+          <img src={logoMarkWhite} alt="" style={{ height: 22, opacity: 0.9 }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 16 }}>
           <SCoin size={44} fontSize={22} animate shadow="0 4px 14px rgba(247,148,29,0.5)" />

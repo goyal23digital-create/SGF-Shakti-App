@@ -22,7 +22,9 @@ export const PRODUCTS: Product[] = [
   { id: 'heritage', code: 'SGF-9901', name: 'Heritage Storage Stool', img: 'dsc09048', dealer: 960, mrp: 1599, carton: 4, moq: 4, tag: '2× SP', cat: 'stool' },
 ];
 
-export const productImg = (p: { img: string }) => `assets/products/${p.img}.jpg`;
+import { PRODUCT_IMAGES } from '../assets';
+
+export const productImg = (p: { img: string }) => PRODUCT_IMAGES[p.img];
 
 export const CAT_DEFS: Array<[string, string]> = [
   ['all', 'All models'],
