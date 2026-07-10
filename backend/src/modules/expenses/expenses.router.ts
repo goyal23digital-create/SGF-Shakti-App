@@ -60,7 +60,7 @@ expensesRouter.put('/:id', async (req: AuthRequest, res) => {
   const { date, payee, categoryId, amount, paymentMode, remarks, fyYear } = req.body;
   if (amount != null && Number(amount) < 0) throw new AppError(400, 'amount must be non-negative');
 
-  if (categoryId != null) {
+  if (categoryId) {
     const cat = await prisma.expenseCategory.findUnique({ where: { id: Number(categoryId) } });
     if (!cat) throw new AppError(404, 'Category not found');
   }
@@ -71,7 +71,7 @@ expensesRouter.put('/:id', async (req: AuthRequest, res) => {
       data: {
         ...(date ? { date: new Date(date) } : {}),
         ...(payee ? { payee } : {}),
-        ...(categoryId !== undefined ? { categoryId: categoryId === null ? null : Number(categoryId) } : {}),
+        ...(categoryId !== undefined ? { categoryId: categoryId ? Number(categoryId) : null } : {}),
         ...(amount != null ? { amount } : {}),
         ...(paymentMode ? { paymentMode } : {}),
         ...(remarks !== undefined ? { remarks } : {}),

@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import { useInventoryIn, useCreateInventoryIn, useVoidInventoryIn, useItems, useInventoryStatus } from '../api/hooks';
+import { useState, useRef } from 'react';
+import { useInventoryIn, useCreateInventoryIn, useUpdateInventoryIn, useVoidInventoryIn, useItems, useInventoryStatus } from '../api/hooks';
 import { FySelector } from '../components/FySelector';
 
 function today() { return new Date().toISOString().slice(0, 10); }
 
 const typeColor: Record<string, string> = { PRODUCTION: 'badge-green', OPENING: 'badge-blue', ADJUSTMENT: 'badge-orange' };
+
+const EMPTY = { date: today(), itemId: '', quantity: '', type: 'PRODUCTION', remarks: '' };
 
 export function InventoryPage() {
   const [fy, setFy] = useState('2026-27');
@@ -12,16 +14,45 @@ export function InventoryPage() {
   const { data: items = [] } = useItems();
   const { data: stock = [] } = useInventoryStatus(fy);
   const create = useCreateInventoryIn();
+  const update = useUpdateInventoryIn();
   const voidInv = useVoidInventoryIn();
-  const [form, setForm] = useState({ date: today(), itemId: '', quantity: '', type: 'PRODUCTION', remarks: '' });
+  const [form, setForm] = useState(() => ({ ...EMPTY, date: today() }));
   const [error, setError] = useState('');
+  const [editId, setEditId] = useState<number | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  function startEdit(r: any) {
+    setError('');
+    setForm({
+      date: r.date?.slice(0, 10) ?? today(),
+      itemId: String(r.itemId ?? r.item?.id ?? ''),
+      quantity: String(parseFloat(r.quantity ?? 0) || 0),
+      type: r.type ?? 'PRODUCTION',
+      remarks: r.remarks ?? '',
+    });
+    setEditId(r.id);
+    formRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function cancelEdit() {
+    setEditId(null);
+    setForm({ ...EMPTY, date: today() });
+    setError('');
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
-    create.mutateAsync({ ...form, fyYear: fy })
-      .then(() => setForm((f) => ({ ...f, quantity: '', remarks: '' })))
-      .catch((e: any) => setError(e.response?.data?.error ?? 'Error'));
+    const payload = { ...form, fyYear: fy };
+    if (editId !== null) {
+      update.mutateAsync({ id: editId, ...payload })
+        .then(() => { setEditId(null); setForm({ ...EMPTY, date: today() }); })
+        .catch((e: any) => setError(e.response?.data?.error ?? 'Error'));
+    } else {
+      create.mutateAsync(payload)
+        .then(() => setForm((f) => ({ ...f, quantity: '', remarks: '' })))
+        .catch((e: any) => setError(e.response?.data?.error ?? 'Error'));
+    }
   }
 
   const selectedStock = stock.find((s: any) => String(s.id) === form.itemId);
@@ -39,7 +70,13 @@ export function InventoryPage() {
 
       <div className="card">
         <h2 className="text-sm font-semibold text-gray-700 mb-4">New Entry</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} ref={formRef}>
+          {editId !== null && (
+            <div className="flex items-center gap-3 mb-4 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm font-medium">
+              <span>✏️ Editing entry #{editId} — saving will overwrite it</span>
+              <button type="button" className="btn-secondary" onClick={cancelEdit}>Cancel</button>
+            </div>
+          )}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             <div className="form-field">
               <label className="label">Date</label>
@@ -57,7 +94,7 @@ export function InventoryPage() {
             </div>
             <div className="form-field">
               <label className="label">Quantity</label>
-              <input type="number" className="input" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} required min="0" step="1" />
+              <input type="number" className="input" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} required min="0" step="any" />
             </div>
             <div className="form-field">
               <label className="label">Type</label>
@@ -73,7 +110,9 @@ export function InventoryPage() {
               <label className="label">Remarks</label>
               <input type="text" className="input" value={form.remarks} onChange={(e) => setForm({ ...form, remarks: e.target.value })} placeholder="Optional" />
             </div>
-            <button type="submit" className="btn-primary" disabled={create.isPending}>{create.isPending ? 'Saving…' : 'Add Row'}</button>
+            <button type="submit" className="btn-primary" disabled={create.isPending || update.isPending}>
+              {editId !== null ? (update.isPending ? 'Updating…' : 'Update') : (create.isPending ? 'Saving…' : 'Add Row')}
+            </button>
           </div>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </form>
@@ -93,7 +132,10 @@ export function InventoryPage() {
                   <td className="text-right font-mono font-semibold">{parseFloat(r.quantity).toFixed(0)}</td>
                   <td><span className={`badge ${typeColor[r.type] ?? 'badge-gray'}`}>{r.type}</span></td>
                   <td className="text-gray-400 text-xs">{r.remarks}</td>
-                  <td><button onClick={() => { if (confirm('Void this entry?')) voidInv.mutate(r.id); }} className="btn-danger">Void</button></td>
+                  <td className="whitespace-nowrap">
+                    <button onClick={() => startEdit(r)} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium mr-2">Edit</button>
+                    <button onClick={() => { if (confirm('Void this entry?')) voidInv.mutate(r.id); }} className="btn-danger">Void</button>
+                  </td>
                 </tr>
               ))}
             </tbody>
