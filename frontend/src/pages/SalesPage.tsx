@@ -3,6 +3,14 @@ import { useSales, useCreateSale, useVoidSale, useItems, useParties } from '../a
 import { FySelector } from '../components/FySelector';
 import { api } from '../api/client';
 
+function today() { return new Date().toISOString().slice(0, 10); }
+function fmt(v: any) { return parseFloat(v || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 }); }
+
+const EMPTY = {
+  date: today(), itemId: '', partyId: '', quantity: '', unitPrice: '',
+  discountAmount: '0', carriageAmount: '0', taxPercent: '18', gstType: 'IGST', remarks: '',
+};
+
 export function SalesPage() {
   const [fy, setFy] = useState('2026-27');
   const { data: rows = [], isLoading } = useSales({ fyYear: fy });
@@ -10,10 +18,9 @@ export function SalesPage() {
   const { data: parties = [] } = useParties();
   const create = useCreateSale();
   const voidSale = useVoidSale();
-  const [form, setForm] = useState({ date: today(), itemId: '', partyId: '', quantity: '', unitPrice: '', remarks: '' });
+  const [form, setForm] = useState(EMPTY);
   const [error, setError] = useState('');
 
-  // Auto-fill price when party+item selected
   useEffect(() => {
     if (!form.partyId || !form.itemId) return;
     api.get(`/parties/${form.partyId}/rate/${form.itemId}`).then((r) => {
@@ -21,91 +28,154 @@ export function SalesPage() {
     }).catch(() => {});
   }, [form.partyId, form.itemId]);
 
+  const qty = parseFloat(form.quantity) || 0;
+  const price = parseFloat(form.unitPrice) || 0;
+  const discount = parseFloat(form.discountAmount) || 0;
+  const carriage = parseFloat(form.carriageAmount) || 0;
+  const taxPct = parseFloat(form.taxPercent) || 0;
+  const baseValue = qty * price - discount + carriage;
+  const taxAmount = baseValue * taxPct / 100;
+  const grandTotal = baseValue + taxAmount;
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    create.mutateAsync({ ...form, fyYear: fy }).then(() => setForm({ ...form, quantity: '', remarks: '' })).catch((e) => setError(e.response?.data?.error ?? 'Error'));
+    setError('');
+    create.mutateAsync({ ...form, fyYear: fy, carriageAmount: carriage, taxPercent: taxPct, discountAmount: discount })
+      .then(() => setForm((f) => ({ ...f, quantity: '', discountAmount: '0', carriageAmount: '0', remarks: '' })))
+      .catch((e: any) => setError(e.response?.data?.error ?? 'Error'));
   }
 
-  const totalValue = rows.reduce((s: number, r: any) => s + parseFloat(r.value ?? 0), 0);
+  const totalGrand = rows.reduce((s: number, r: any) => s + parseFloat(r.grandTotal ?? r.value ?? 0), 0);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold">Sales / Dispatch</h1>
-          <p className="text-gray-500 text-sm">{rows.length} entries · Total ₹{totalValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+          <h1 className="page-title">Sales / Dispatch</h1>
+          <p className="page-subtitle">{rows.length} entries · Grand Total ₹{totalGrand.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
         </div>
         <FySelector value={fy} onChange={setFy} />
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-4 flex flex-wrap gap-3 items-end">
-        <Field label="Date" value={form.date} onChange={(v) => setForm({ ...form, date: v })} type="date" required />
-        <div className="flex flex-col gap-0.5">
-          <label className="text-xs font-medium text-gray-600">Party</label>
-          <select value={form.partyId} onChange={(e) => setForm({ ...form, partyId: e.target.value })} required className="border border-gray-300 rounded px-2 py-1 text-sm w-52">
-            <option value="">— select party —</option>
-            {parties.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
-          </select>
-        </div>
-        <div className="flex flex-col gap-0.5">
-          <label className="text-xs font-medium text-gray-600">Item</label>
-          <select value={form.itemId} onChange={(e) => setForm({ ...form, itemId: e.target.value })} required className="border border-gray-300 rounded px-2 py-1 text-sm w-52">
-            <option value="">— select item —</option>
-            {items.map((i: any) => <option key={i.id} value={i.id}>{i.code} — {i.name}</option>)}
-          </select>
-        </div>
-        <Field label="Qty" value={form.quantity} onChange={(v) => setForm({ ...form, quantity: v })} type="number" required />
-        <Field label="Unit Price (₹)" value={form.unitPrice} onChange={(v) => setForm({ ...form, unitPrice: v })} type="number" required />
-        <div className="flex flex-col gap-0.5 w-28">
-          <label className="text-xs font-medium text-gray-600">Value</label>
-          <div className="border border-gray-200 bg-gray-50 rounded px-2 py-1 text-sm font-mono">
-            {form.quantity && form.unitPrice ? `₹${(parseFloat(form.quantity) * parseFloat(form.unitPrice)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}` : '—'}
+      <div className="card">
+        <h2 className="text-sm font-semibold text-gray-700 mb-4">New Sale Entry</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div className="form-field">
+              <label className="label">Date</label>
+              <input type="date" className="input" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required />
+            </div>
+            <div className="form-field">
+              <label className="label">Party</label>
+              <select className="input" value={form.partyId} onChange={(e) => setForm({ ...form, partyId: e.target.value })} required>
+                <option value="">— select party —</option>
+                {parties.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </select>
+            </div>
+            <div className="form-field md:col-span-2">
+              <label className="label">Item</label>
+              <select className="input" value={form.itemId} onChange={(e) => setForm({ ...form, itemId: e.target.value })} required>
+                <option value="">— select item —</option>
+                {items.map((i: any) => <option key={i.id} value={i.id}>{i.code} — {i.name}</option>)}
+              </select>
+            </div>
           </div>
-        </div>
-        <Field label="Remarks" value={form.remarks} onChange={(v) => setForm({ ...form, remarks: v })} width="w-40" />
-        <button type="submit" className="bg-brand-600 text-white px-4 py-1.5 rounded text-sm hover:bg-brand-700">Add Sale</button>
-        {error && <span className="text-red-500 text-sm">{error}</span>}
-      </form>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div className="form-field">
+              <label className="label">Quantity</label>
+              <input type="number" className="input" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} required min="0" step="1" />
+            </div>
+            <div className="form-field">
+              <label className="label">Unit Price (₹)</label>
+              <input type="number" className="input" value={form.unitPrice} onChange={(e) => setForm({ ...form, unitPrice: e.target.value })} required min="0" step="0.01" />
+            </div>
+            <div className="form-field">
+              <label className="label">Discount (₹)</label>
+              <input type="number" className="input" value={form.discountAmount} onChange={(e) => setForm({ ...form, discountAmount: e.target.value })} min="0" step="0.01" />
+            </div>
+            <div className="form-field">
+              <label className="label">Carriage (₹)</label>
+              <input type="number" className="input" value={form.carriageAmount} onChange={(e) => setForm({ ...form, carriageAmount: e.target.value })} min="0" step="0.01" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+            <div className="form-field">
+              <label className="label">GST Type</label>
+              <select className="input" value={form.gstType} onChange={(e) => setForm({ ...form, gstType: e.target.value })}>
+                <option value="IGST">IGST</option>
+                <option value="CGST+SGST">CGST + SGST</option>
+              </select>
+            </div>
+            <div className="form-field">
+              <label className="label">GST %</label>
+              <input type="number" className="input" value={form.taxPercent} onChange={(e) => setForm({ ...form, taxPercent: e.target.value })} min="0" max="28" step="0.01" />
+            </div>
+            <div className="form-field">
+              <label className="label">Base Value</label>
+              <div className="input-readonly">₹{fmt(baseValue)}</div>
+            </div>
+            <div className="form-field">
+              <label className="label">Tax Amount</label>
+              <div className="input-readonly">₹{fmt(taxAmount)}</div>
+            </div>
+            <div className="form-field">
+              <label className="label">Grand Total</label>
+              <div className="input-readonly font-semibold text-indigo-700">₹{fmt(grandTotal)}</div>
+            </div>
+          </div>
+          <div className="flex items-end gap-4">
+            <div className="form-field flex-1">
+              <label className="label">Remarks</label>
+              <input type="text" className="input" value={form.remarks} onChange={(e) => setForm({ ...form, remarks: e.target.value })} placeholder="Optional" />
+            </div>
+            <button type="submit" className="btn-primary" disabled={create.isPending}>{create.isPending ? 'Saving…' : 'Add Sale'}</button>
+          </div>
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        </form>
+      </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-auto">
-        {isLoading ? <p className="p-4 text-gray-400">Loading…</p> : (
-          <table className="table-grid">
-            <thead><tr><th>Date</th><th>Party</th><th>Code</th><th>Item</th><th className="text-right">Qty</th><th className="text-right">Price</th><th className="text-right">Value</th><th>Remarks</th><th></th></tr></thead>
-            <tbody>
-              {rows.map((r: any) => (
-                <tr key={r.id}>
-                  <td>{r.date?.slice(0, 10)}</td>
-                  <td>{r.party.name}</td>
-                  <td className="font-mono">{r.item.code}</td>
-                  <td>{r.item.name}</td>
-                  <td className="text-right font-mono">{parseFloat(r.quantity).toFixed(0)}</td>
-                  <td className="text-right font-mono">₹{parseFloat(r.unitPrice).toLocaleString('en-IN')}</td>
-                  <td className="text-right font-mono font-semibold">₹{parseFloat(r.value).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
-                  <td className="text-gray-500 text-xs">{r.remarks}</td>
-                  <td><button onClick={() => voidSale.mutate(r.id)} className="text-red-500 hover:underline text-xs">Void</button></td>
+      <div className="card p-0 overflow-hidden">
+        {isLoading ? <p className="p-5 text-gray-400">Loading…</p> : (
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th><th>Party</th><th>Item</th>
+                  <th className="text-right">Qty</th><th className="text-right">Price</th>
+                  <th className="text-right">Disc</th><th className="text-right">Carriage</th>
+                  <th className="text-right">Base Value</th><th>GST</th>
+                  <th className="text-right">Grand Total</th><th>Remarks</th><th></th>
                 </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr className="bg-gray-50 font-semibold">
-                <td colSpan={6} className="text-right text-sm">Total</td>
-                <td className="text-right font-mono">₹{totalValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
-                <td colSpan={2}></td>
-              </tr>
-            </tfoot>
-          </table>
+              </thead>
+              <tbody>
+                {rows.map((r: any) => (
+                  <tr key={r.id}>
+                    <td className="text-gray-500">{r.date?.slice(0, 10)}</td>
+                    <td className="font-medium">{r.party.name}</td>
+                    <td><span className="badge badge-blue mr-1">{r.item.code}</span>{r.item.name}</td>
+                    <td className="text-right font-mono">{parseFloat(r.quantity).toFixed(0)}</td>
+                    <td className="text-right font-mono">₹{fmt(r.unitPrice)}</td>
+                    <td className="text-right font-mono text-gray-400">{parseFloat(r.discountAmount || 0) > 0 ? `₹${fmt(r.discountAmount)}` : '—'}</td>
+                    <td className="text-right font-mono text-gray-400">{parseFloat(r.carriageAmount || 0) > 0 ? `₹${fmt(r.carriageAmount)}` : '—'}</td>
+                    <td className="text-right font-mono">₹{fmt(r.value)}</td>
+                    <td><span className="badge badge-purple">{r.gstType} {parseFloat(r.taxPercent || 0).toFixed(0)}%</span></td>
+                    <td className="text-right font-mono font-semibold text-indigo-700">₹{fmt(r.grandTotal)}</td>
+                    <td className="text-gray-400 text-xs">{r.remarks}</td>
+                    <td><button onClick={() => { if (confirm('Void this sale?')) voidSale.mutate(r.id); }} className="btn-danger">Void</button></td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan={9} className="text-right text-xs text-gray-500">Grand Total</td>
+                  <td className="text-right font-mono text-indigo-700">₹{totalGrand.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                  <td colSpan={2}></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         )}
       </div>
-    </div>
-  );
-}
-
-function today() { return new Date().toISOString().slice(0, 10); }
-function Field({ label, value, onChange, type = 'text', required, width = 'w-28' }: any) {
-  return (
-    <div className={`flex flex-col gap-0.5 ${width}`}>
-      <label className="text-xs font-medium text-gray-600">{label}</label>
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} className="border border-gray-300 rounded px-2 py-1 text-sm" step={type === 'number' ? '0.001' : undefined} />
     </div>
   );
 }

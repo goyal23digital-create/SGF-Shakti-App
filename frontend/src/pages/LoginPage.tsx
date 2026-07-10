@@ -3,42 +3,74 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 
 export function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('admin@sgf.com');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setLoading(true);
     try {
       const res = await api.post('/auth/login', { email, password });
       localStorage.setItem('token', res.data.token);
       navigate('/dashboard');
     } catch {
-      setError('Invalid credentials');
+      setError('Invalid email or password');
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Shakti Gold Furniture</h1>
-        <p className="text-gray-500 text-sm mb-6">ERP System — Sign in</p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input className="w-full border border-gray-300 rounded px-3 py-2 text-sm" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
+    <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%)' }}>
+      <div className="w-full max-w-sm px-4">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
+            SGF
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input className="w-full border border-gray-300 rounded px-3 py-2 text-sm" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <button type="submit" className="w-full bg-brand-600 text-white rounded py-2 font-medium hover:bg-brand-700 transition-colors">
-            Sign in
-          </button>
-        </form>
+          <h1 className="text-2xl font-bold text-white">Shakti Gold Furniture</h1>
+          <p className="text-white/50 text-sm mt-1">Steel & Furniture ERP · 2026-27</p>
+        </div>
+
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8">
+          <h2 className="text-lg font-semibold text-slate-800 mb-6">Sign in to continue</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="label">Email address</label>
+              <input
+                className="input"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="label">Password</label>
+              <input
+                className="input"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+              />
+            </div>
+            {error && (
+              <div className="bg-red-50 text-red-600 text-sm px-3 py-2 rounded-lg">{error}</div>
+            )}
+            <button type="submit" className="btn-primary w-full py-2.5 mt-2" disabled={loading}>
+              {loading ? 'Signing in…' : 'Sign in'}
+            </button>
+          </form>
+          <p className="text-center text-xs text-gray-400 mt-4">Default: admin@sgf.com / admin123</p>
+        </div>
       </div>
     </div>
   );

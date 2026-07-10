@@ -12,9 +12,15 @@ export function ItemsPage() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
-    const data = { code: form.code.trim(), name: form.name.trim(), avgWeight: form.avgWeight || undefined, withFlashWeight: form.withFlashWeight || undefined, maxWeight: form.maxWeight || undefined };
+    const data = {
+      code: form.code.trim(), name: form.name.trim(),
+      avgWeight: form.avgWeight || undefined,
+      withFlashWeight: form.withFlashWeight || undefined,
+      maxWeight: form.maxWeight || undefined,
+    };
     const op = editId ? update.mutateAsync({ id: editId, ...data }) : create.mutateAsync(data);
-    op.then(() => { setForm({ code: '', name: '', avgWeight: '', withFlashWeight: '', maxWeight: '' }); setEditId(null); }).catch((e) => setError(e.response?.data?.error ?? 'Error'));
+    op.then(() => { setForm({ code: '', name: '', avgWeight: '', withFlashWeight: '', maxWeight: '' }); setEditId(null); })
+      .catch((e: any) => setError(e.response?.data?.error ?? 'Error'));
   }
 
   function startEdit(item: any) {
@@ -24,54 +30,63 @@ export function ItemsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Items (Product Master)</h1>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Items (Product Master)</h1>
+          <p className="page-subtitle">{items.length} items configured</p>
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-4 flex flex-wrap gap-3 items-end">
-        <Field label="Code" value={form.code} onChange={(v) => setForm({ ...form, code: v })} required disabled={!!editId} />
-        <Field label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} required width="w-48" />
-        <Field label="Avg Weight" value={form.avgWeight} onChange={(v) => setForm({ ...form, avgWeight: v })} type="number" width="w-28" />
-        <Field label="Flash Weight" value={form.withFlashWeight} onChange={(v) => setForm({ ...form, withFlashWeight: v })} type="number" width="w-28" />
-        <Field label="Max Weight" value={form.maxWeight} onChange={(v) => setForm({ ...form, maxWeight: v })} type="number" width="w-28" />
-        <button type="submit" className="bg-brand-600 text-white px-4 py-1.5 rounded text-sm hover:bg-brand-700">{editId ? 'Update' : 'Add Item'}</button>
-        {editId && <button type="button" onClick={() => { setEditId(null); setForm({ code: '', name: '', avgWeight: '', withFlashWeight: '', maxWeight: '' }); }} className="text-sm text-gray-500 hover:underline">Cancel</button>}
-        {error && <span className="text-red-500 text-sm">{error}</span>}
-      </form>
+      <div className="card">
+        <h2 className="text-sm font-semibold text-gray-700 mb-4">{editId ? 'Edit Item' : 'Add New Item'}</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+            <div className="form-field">
+              <label className="label">Code *</label>
+              <input type="text" className="input disabled:bg-slate-50 disabled:text-gray-400" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} required disabled={!!editId} placeholder="e.g. 9L" />
+            </div>
+            <div className="form-field md:col-span-2">
+              <label className="label">Name *</label>
+              <input type="text" className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required placeholder="Product name" />
+            </div>
+            <div className="form-field">
+              <label className="label">Avg Weight (kg)</label>
+              <input type="number" className="input" value={form.avgWeight} onChange={(e) => setForm({ ...form, avgWeight: e.target.value })} step="0.001" />
+            </div>
+            <div className="form-field">
+              <label className="label">Flash Weight (kg)</label>
+              <input type="number" className="input" value={form.withFlashWeight} onChange={(e) => setForm({ ...form, withFlashWeight: e.target.value })} step="0.001" />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button type="submit" className="btn-primary" disabled={create.isPending || update.isPending}>{editId ? 'Update Item' : 'Add Item'}</button>
+            {editId && <button type="button" onClick={() => { setEditId(null); setForm({ code: '', name: '', avgWeight: '', withFlashWeight: '', maxWeight: '' }); }} className="btn-secondary">Cancel</button>}
+            {error && <span className="text-red-500 text-sm">{error}</span>}
+          </div>
+        </form>
+      </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-auto">
-        {isLoading ? <p className="p-4 text-gray-400">Loading…</p> : (
-          <table className="table-grid">
+      <div className="card p-0 overflow-hidden">
+        {isLoading ? <p className="p-5 text-gray-400">Loading…</p> : (
+          <table className="data-table">
             <thead>
-              <tr><th>Code</th><th>Name</th><th>Avg Wt</th><th>Flash Wt</th><th>Max Wt</th><th></th></tr>
+              <tr><th>Code</th><th>Name</th><th className="text-right">Avg Weight</th><th className="text-right">Flash Wt</th><th className="text-right">Max Wt</th><th></th></tr>
             </thead>
             <tbody>
               {items.map((item: any) => (
                 <tr key={item.id}>
-                  <td className="font-mono font-bold">{item.code}</td>
-                  <td>{item.name}</td>
-                  <td>{item.avgWeight}</td>
-                  <td>{item.withFlashWeight}</td>
-                  <td>{item.maxWeight}</td>
-                  <td><button onClick={() => startEdit(item)} className="text-blue-600 hover:underline text-xs">Edit</button></td>
+                  <td><span className="badge badge-blue font-mono">{item.code}</span></td>
+                  <td className="font-medium">{item.name}</td>
+                  <td className="text-right font-mono text-gray-600">{item.avgWeight ? `${item.avgWeight} kg` : '—'}</td>
+                  <td className="text-right font-mono text-gray-600">{item.withFlashWeight ? `${item.withFlashWeight} kg` : '—'}</td>
+                  <td className="text-right font-mono text-gray-600">{item.maxWeight ? `${item.maxWeight} kg` : '—'}</td>
+                  <td><button onClick={() => startEdit(item)} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium">Edit</button></td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
       </div>
-    </div>
-  );
-}
-
-function Field({ label, value, onChange, required, type = 'text', width = 'w-32', disabled = false }: any) {
-  return (
-    <div className={`flex flex-col gap-0.5 ${width}`}>
-      <label className="text-xs font-medium text-gray-600">{label}</label>
-      <input
-        type={type} value={value} onChange={(e) => onChange(e.target.value)}
-        required={required} disabled={disabled}
-        className="border border-gray-300 rounded px-2 py-1 text-sm disabled:bg-gray-100"
-        step={type === 'number' ? '0.001' : undefined}
-      />
     </div>
   );
 }

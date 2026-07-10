@@ -30,6 +30,10 @@ export function useCreateParty() {
   const qc = useQueryClient();
   return useMutation({ mutationFn: (data: object) => api.post('/parties', data).then((r) => r.data), onSuccess: () => qc.invalidateQueries({ queryKey: ['parties'] }) });
 }
+export function useUpdateParty() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: ({ id, ...data }: { id: number } & object) => api.put(`/parties/${id}`, data).then((r) => r.data), onSuccess: () => qc.invalidateQueries({ queryKey: ['parties'] }) });
+}
 export function usePartyRate(partyId: number, itemId: number) {
   return useQuery({ queryKey: ['rate', partyId, itemId], queryFn: () => api.get(`/parties/${partyId}/rate/${itemId}`).then((r) => r.data), enabled: !!partyId && !!itemId });
 }
@@ -42,6 +46,10 @@ export function useCreateInventoryIn() {
   const qc = useQueryClient();
   return useMutation({ mutationFn: (data: object) => api.post('/inventory', data).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['inventory-in'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
 }
+export function useVoidInventoryIn() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: (id: number) => api.delete(`/inventory/${id}`).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['inventory-in'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
+}
 
 // ── Sales ─────────────────────────────────────────────────────────────────────
 export function useSales(filters: Record<string, string> = {}) {
@@ -49,7 +57,14 @@ export function useSales(filters: Record<string, string> = {}) {
 }
 export function useCreateSale() {
   const qc = useQueryClient();
-  return useMutation({ mutationFn: (data: object) => api.post('/sales', data).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['sales'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
+  return useMutation({
+    mutationFn: (data: {
+      date: string; itemId: string | number; quantity: string | number; unitPrice: string | number;
+      partyId: string | number; remarks?: string; fyYear: string;
+      carriageAmount?: number; taxPercent?: number; discountAmount?: number; gstType?: string;
+    }) => api.post('/sales', data).then((r) => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['sales'] }); qc.invalidateQueries({ queryKey: ['reports'] }); }
+  });
 }
 export function useVoidSale() {
   const qc = useQueryClient();
@@ -62,7 +77,18 @@ export function useReturns(filters: Record<string, string> = {}) {
 }
 export function useCreateReturn() {
   const qc = useQueryClient();
-  return useMutation({ mutationFn: (data: object) => api.post('/returns', data).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['returns'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
+  return useMutation({
+    mutationFn: (data: {
+      date: string; itemId: string | number; quantity: string | number; unitPrice: string | number;
+      partyId: string | number; remarks?: string; fyYear: string;
+      carriageAmount?: number; taxPercent?: number; discountAmount?: number; gstType?: string;
+    }) => api.post('/returns', data).then((r) => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['returns'] }); qc.invalidateQueries({ queryKey: ['reports'] }); }
+  });
+}
+export function useVoidReturn() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: (id: number) => api.delete(`/returns/${id}`).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['returns'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
 }
 
 // ── Payments ──────────────────────────────────────────────────────────────────
@@ -73,6 +99,10 @@ export function useCreatePayment() {
   const qc = useQueryClient();
   return useMutation({ mutationFn: (data: object) => api.post('/payments', data).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['payments'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
 }
+export function useVoidPayment() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: (id: number) => api.delete(`/payments/${id}`).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['payments'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
+}
 
 // ── Expenses ──────────────────────────────────────────────────────────────────
 export function useExpenses(filters: Record<string, string> = {}) {
@@ -81,6 +111,13 @@ export function useExpenses(filters: Record<string, string> = {}) {
 export function useCreateExpense() {
   const qc = useQueryClient();
   return useMutation({ mutationFn: (data: object) => api.post('/expenses', data).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['expenses'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
+}
+export function useVoidExpense() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: (id: number) => api.delete(`/expenses/${id}`).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['expenses'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
+}
+export function useExpenseCategories() {
+  return useQuery({ queryKey: ['expense-categories'], queryFn: () => api.get('/expenses/categories').then((r) => r.data) });
 }
 
 // ── Reports ───────────────────────────────────────────────────────────────────

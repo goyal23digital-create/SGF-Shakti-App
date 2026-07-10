@@ -3,11 +3,13 @@ import { useInventoryStatus, useSalesAnalysis, useProductionAnalysis, useExpense
 import { FySelector } from '../components/FySelector';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
-const COLORS = ['#f97316', '#3b82f6', '#22c55e', '#a855f7', '#ec4899', '#14b8a6', '#f59e0b', '#6366f1'];
+const COLORS = ['#6366f1', '#f97316', '#22c55e', '#3b82f6', '#a855f7', '#ec4899', '#14b8a6', '#f59e0b'];
+
+type Tab = 'stock' | 'sales' | 'production' | 'expenses';
 
 export function ReportsPage() {
   const [fy, setFy] = useState('2026-27');
-  const [tab, setTab] = useState<'stock' | 'sales' | 'production' | 'expenses'>('stock');
+  const [tab, setTab] = useState<Tab>('stock');
 
   const { data: stock = [] } = useInventoryStatus(fy);
   const { data: salesByItem = [] } = useSalesAnalysis({ fyYear: fy, groupBy: 'item' });
@@ -15,51 +17,62 @@ export function ReportsPage() {
   const { data: production = [] } = useProductionAnalysis({ fyYear: fy });
   const { data: expenseData } = useExpenseSummary({ fyYear: fy });
 
-  const tabs = [
-    { key: 'stock', label: 'Inventory Status' },
-    { key: 'sales', label: 'Sales Analysis' },
-    { key: 'production', label: 'Production Analysis' },
-    { key: 'expenses', label: 'Expense Summary' },
-  ] as const;
+  const tabs: { key: Tab; label: string }[] = [
+    { key: 'stock', label: '📦 Inventory' },
+    { key: 'sales', label: '🛒 Sales' },
+    { key: 'production', label: '🏭 Production' },
+    { key: 'expenses', label: '💸 Expenses' },
+  ];
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Reports & Analytics</h1>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Reports & Analytics</h1>
+          <p className="page-subtitle">Financial year {fy}</p>
+        </div>
         <FySelector value={fy} onChange={setFy} />
       </div>
 
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
+      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
         {tabs.map(({ key, label }) => (
-          <button key={key} onClick={() => setTab(key)} className={`px-4 py-1.5 rounded text-sm font-medium transition-colors ${tab === key ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900'}`}>{label}</button>
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${tab === key ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-800'}`}
+          >
+            {label}
+          </button>
         ))}
       </div>
 
       {tab === 'stock' && (
         <div className="space-y-4">
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
-            <h2 className="font-semibold mb-3">Stock on Hand by Item</h2>
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={stock.filter((s: any) => parseFloat(s.onHand) !== 0)}>
-                <XAxis dataKey="code" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v: any) => [parseFloat(v).toFixed(0), 'Units']} />
-                <Bar dataKey="onHand" fill="#f97316" radius={[3, 3, 0, 0]} />
+          <div className="card">
+            <h2 className="text-sm font-semibold text-gray-700 mb-4">Stock on Hand by Item</h2>
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={stock.filter((s: any) => parseFloat(s.onHand) !== 0)} margin={{ top: 4, right: 8, left: 8, bottom: 4 }}>
+                <XAxis dataKey="code" tick={{ fontSize: 11, fill: '#6b7280' }} />
+                <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} />
+                <Tooltip formatter={(v: any) => [parseFloat(v).toFixed(0) + ' units', 'On Hand']} />
+                <Bar dataKey="onHand" fill="#6366f1" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="bg-white rounded-xl border border-gray-200 overflow-auto">
-            <table className="table-grid">
-              <thead><tr><th>Code</th><th>Item</th><th className="text-right">In</th><th className="text-right">Out</th><th className="text-right">Returns</th><th className="text-right">On Hand</th></tr></thead>
+          <div className="card p-0 overflow-hidden">
+            <table className="data-table">
+              <thead><tr><th>Code</th><th>Item</th><th className="text-right">Produced In</th><th className="text-right">Sold Out</th><th className="text-right">Returns</th><th className="text-right">On Hand</th></tr></thead>
               <tbody>
                 {stock.map((s: any) => (
                   <tr key={s.id}>
-                    <td className="font-mono font-bold">{s.code}</td>
-                    <td>{s.name}</td>
-                    <td className="text-right">{parseFloat(s.inQty).toFixed(0)}</td>
-                    <td className="text-right">{parseFloat(s.outQty).toFixed(0)}</td>
-                    <td className="text-right">{parseFloat(s.returnQty).toFixed(0)}</td>
-                    <td className={`text-right font-bold ${parseFloat(s.onHand) < 10 ? 'text-red-600' : 'text-green-700'}`}>{parseFloat(s.onHand).toFixed(0)}</td>
+                    <td><span className="badge badge-blue font-mono">{s.code}</span></td>
+                    <td className="font-medium">{s.name}</td>
+                    <td className="text-right font-mono">{parseFloat(s.inQty).toFixed(0)}</td>
+                    <td className="text-right font-mono">{parseFloat(s.outQty).toFixed(0)}</td>
+                    <td className="text-right font-mono">{parseFloat(s.returnQty).toFixed(0)}</td>
+                    <td className={`text-right font-mono font-bold ${parseFloat(s.onHand) < 10 ? 'text-red-600' : 'text-emerald-600'}`}>
+                      {parseFloat(s.onHand).toFixed(0)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -71,22 +84,30 @@ export function ReportsPage() {
       {tab === 'sales' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h2 className="font-semibold mb-3">Sales Value by Item</h2>
+            <div className="card">
+              <h2 className="text-sm font-semibold text-gray-700 mb-4">Sales Value by Item</h2>
               <ResponsiveContainer width="100%" height={240}>
-                <BarChart data={salesByItem.slice(0, 12)}>
-                  <XAxis dataKey="label" tick={{ fontSize: 10 }} angle={-20} textAnchor="end" height={50} />
-                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
+                <BarChart data={salesByItem.slice(0, 12)} margin={{ top: 4, right: 8, left: 8, bottom: 30 }}>
+                  <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#6b7280' }} angle={-20} textAnchor="end" height={50} />
+                  <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
                   <Tooltip formatter={(v: any) => [`₹${parseFloat(v).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`, 'Value']} />
-                  <Bar dataKey="value" fill="#f97316" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="value" fill="#6366f1" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h2 className="font-semibold mb-3">Sales by Party</h2>
+            <div className="card">
+              <h2 className="text-sm font-semibold text-gray-700 mb-4">Sales Share by Party</h2>
               <ResponsiveContainer width="100%" height={240}>
                 <PieChart>
-                  <Pie data={salesByParty.slice(0, 8)} dataKey="value" nameKey="label" cx="50%" cy="50%" outerRadius={90} label={({ label, percent }: any) => `${label.split(' ')[0]} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
+                  <Pie
+                    data={salesByParty.slice(0, 8)}
+                    dataKey="value"
+                    nameKey="label"
+                    cx="50%" cy="50%"
+                    outerRadius={90}
+                    label={({ label, percent }: any) => `${label.split(' ')[0]} ${(percent * 100).toFixed(0)}%`}
+                    labelLine={false}
+                  >
                     {salesByParty.slice(0, 8).map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
                   <Tooltip formatter={(v: any) => [`₹${parseFloat(v).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`, 'Sales']} />
@@ -94,12 +115,16 @@ export function ReportsPage() {
               </ResponsiveContainer>
             </div>
           </div>
-          <div className="bg-white rounded-xl border border-gray-200 overflow-auto">
-            <table className="table-grid">
+          <div className="card p-0 overflow-hidden">
+            <table className="data-table">
               <thead><tr><th>Party</th><th className="text-right">Sales Value (₹)</th><th className="text-right">Qty</th></tr></thead>
               <tbody>
-                {salesByParty.sort((a: any, b: any) => parseFloat(b.value) - parseFloat(a.value)).map((r: any) => (
-                  <tr key={r.key}><td>{r.label}</td><td className="text-right font-mono">₹{parseFloat(r.value).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td><td className="text-right">{parseFloat(r.quantity).toFixed(0)}</td></tr>
+                {[...salesByParty].sort((a: any, b: any) => parseFloat(b.value) - parseFloat(a.value)).map((r: any) => (
+                  <tr key={r.key}>
+                    <td className="font-medium">{r.label}</td>
+                    <td className="text-right font-mono">₹{parseFloat(r.value).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
+                    <td className="text-right font-mono">{parseFloat(r.quantity).toFixed(0)}</td>
+                  </tr>
                 ))}
               </tbody>
             </table>
@@ -109,34 +134,49 @@ export function ReportsPage() {
 
       {tab === 'production' && (
         <div className="space-y-4">
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
-            <h2 className="font-semibold mb-3">Production by Item</h2>
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={production}>
-                <XAxis dataKey="label" tick={{ fontSize: 11 }} angle={-20} textAnchor="end" height={50} />
-                <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip />
-                <Bar dataKey="quantity" fill="#3b82f6" radius={[3, 3, 0, 0]} />
+          <div className="card">
+            <h2 className="text-sm font-semibold text-gray-700 mb-4">Production Quantity by Item</h2>
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={production} margin={{ top: 4, right: 8, left: 8, bottom: 30 }}>
+                <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#6b7280' }} angle={-20} textAnchor="end" height={50} />
+                <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} />
+                <Tooltip formatter={(v: any) => [parseFloat(v).toFixed(0) + ' units', 'Produced']} />
+                <Bar dataKey="quantity" fill="#22c55e" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="bg-white rounded-xl border border-gray-200 overflow-auto">
-            <table className="table-grid">
-              <thead><tr><th>Item</th><th className="text-right">Qty Produced</th></tr></thead>
-              <tbody>{production.map((r: any) => <tr key={r.key}><td>{r.label}</td><td className="text-right font-mono">{parseFloat(r.quantity).toFixed(0)}</td></tr>)}</tbody>
+          <div className="card p-0 overflow-hidden">
+            <table className="data-table">
+              <thead><tr><th>Item</th><th className="text-right">Units Produced</th></tr></thead>
+              <tbody>
+                {production.map((r: any) => (
+                  <tr key={r.key}>
+                    <td className="font-medium">{r.label}</td>
+                    <td className="text-right font-mono font-semibold">{parseFloat(r.quantity).toFixed(0)}</td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         </div>
       )}
 
       {tab === 'expenses' && expenseData && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h2 className="font-semibold mb-3">Expense by Category</h2>
+            <div className="card">
+              <h2 className="text-sm font-semibold text-gray-700 mb-4">Expense by Category</h2>
               <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
-                  <Pie data={expenseData.summary} dataKey="total" nameKey="category" cx="50%" cy="50%" outerRadius={90} label={({ category, percent }: any) => `${category.split(' ')[0]} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
+                  <Pie
+                    data={expenseData.summary}
+                    dataKey="total"
+                    nameKey="category"
+                    cx="50%" cy="50%"
+                    outerRadius={90}
+                    label={({ category, percent }: any) => `${category.split(' ')[0]} ${(percent * 100).toFixed(0)}%`}
+                    labelLine={false}
+                  >
                     {expenseData.summary.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
                   <Tooltip formatter={(v: any) => [`₹${parseFloat(v).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`, '']} />
@@ -144,14 +184,19 @@ export function ReportsPage() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h2 className="font-semibold mb-1">Summary</h2>
-              <div className="text-3xl font-bold text-red-600 mb-4">₹{parseFloat(expenseData.grandTotal).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</div>
-              <div className="space-y-1">
-                {expenseData.summary.map((r: any) => (
-                  <div key={r.category} className="flex justify-between text-sm">
-                    <span>{r.category}</span>
-                    <span className="font-mono">₹{parseFloat(r.total).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
+            <div className="card">
+              <h2 className="text-sm font-semibold text-gray-700 mb-1">Total Expenses</h2>
+              <div className="text-4xl font-bold text-red-600 mb-6">
+                ₹{parseFloat(expenseData.grandTotal).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+              </div>
+              <div className="space-y-2">
+                {expenseData.summary.map((r: any, i: number) => (
+                  <div key={r.category} className="flex justify-between items-center py-1 border-b border-gray-50">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ background: COLORS[i % COLORS.length] }} />
+                      <span className="text-sm text-gray-700">{r.category}</span>
+                    </div>
+                    <span className="font-mono text-sm font-medium">₹{parseFloat(r.total).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
                   </div>
                 ))}
               </div>

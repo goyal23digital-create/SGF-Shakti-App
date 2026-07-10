@@ -21,15 +21,18 @@ partiesRouter.get('/:id', async (req, res) => {
 });
 
 partiesRouter.post('/', requireRole('ADMIN', 'MANAGER'), async (req, res) => {
-  const { name, city, phone } = req.body;
+  const { name, city, phone, gstin, address, stateCode } = req.body;
   if (!name) throw new AppError(400, 'name required');
-  const party = await prisma.party.create({ data: { name, city, phone } });
+  const party = await prisma.party.create({ data: { name, city, phone, gstin, address, stateCode } });
   res.status(201).json(party);
 });
 
 partiesRouter.put('/:id', requireRole('ADMIN', 'MANAGER'), async (req, res) => {
-  const { name, city, phone, isActive } = req.body;
-  const party = await prisma.party.update({ where: { id: Number(req.params.id) }, data: { name, city, phone, isActive } });
+  const { name, city, phone, isActive, gstin, address, stateCode } = req.body;
+  const party = await prisma.party.update({
+    where: { id: Number(req.params.id) },
+    data: { name, city, phone, isActive, gstin, address, stateCode },
+  });
   res.json(party);
 });
 

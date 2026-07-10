@@ -4,8 +4,18 @@ const FY_OPTIONS = ['2026-27', '2025-26', '2024-25'];
 
 export function FySelector({ value, onChange }: Props) {
   return (
-    <select value={value} onChange={(e) => onChange(e.target.value)} className="border border-gray-300 rounded px-2 py-1 text-sm">
-      {FY_OPTIONS.map((fy) => <option key={fy} value={fy}>{fy}</option>)}
-    </select>
+    <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1">
+      {FY_OPTIONS.map((fy) => (
+        <button
+          key={fy}
+          onClick={() => onChange(fy)}
+          className={`px-3 py-1 rounded-md text-xs font-semibold transition-colors ${
+            value === fy ? 'bg-indigo-600 text-white' : 'text-gray-500 hover:text-gray-800'
+          }`}
+        >
+          {fy}
+        </button>
+      ))}
+    </div>
   );
 }

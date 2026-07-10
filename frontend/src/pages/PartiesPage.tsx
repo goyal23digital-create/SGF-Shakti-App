@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import { useParties, useCreateParty, useItems } from '../api/hooks';
 import { api } from '../api/client';
 
+const EMPTY_FORM = { name: '', city: '', phone: '', gstin: '', address: '', stateCode: '' };
+
 export function PartiesPage() {
   const { data: parties = [], isLoading } = useParties();
   const { data: items = [] } = useItems();
   const create = useCreateParty();
-  const [form, setForm] = useState({ name: '', city: '', phone: '' });
+  const [form, setForm] = useState(EMPTY_FORM);
   const [error, setError] = useState('');
   const [selectedParty, setSelectedParty] = useState<any>(null);
   const [rates, setRates] = useState<Record<number, string>>({});
@@ -15,7 +17,9 @@ export function PartiesPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    create.mutateAsync(form).then(() => setForm({ name: '', city: '', phone: '' })).catch((e) => setError(e.response?.data?.error ?? 'Error'));
+    create.mutateAsync(form)
+      .then(() => setForm(EMPTY_FORM))
+      .catch((e: any) => setError(e.response?.data?.error ?? 'Error'));
   }
 
   async function openRates(party: any) {
@@ -36,29 +40,68 @@ export function PartiesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Parties (Dealers)</h1>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Parties (Dealers)</h1>
+          <p className="page-subtitle">{parties.length} active parties</p>
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-4 flex flex-wrap gap-3 items-end">
-        <Field label="Party Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} required width="w-64" />
-        <Field label="City" value={form.city} onChange={(v) => setForm({ ...form, city: v })} width="w-36" />
-        <Field label="Phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} width="w-36" />
-        <button type="submit" className="bg-brand-600 text-white px-4 py-1.5 rounded text-sm hover:bg-brand-700">Add Party</button>
-        {error && <span className="text-red-500 text-sm">{error}</span>}
-      </form>
+      <div className="card">
+        <h2 className="text-sm font-semibold text-gray-700 mb-4">Add New Party</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+            <div className="form-field">
+              <label className="label">Party Name *</label>
+              <input type="text" className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required placeholder="Full legal name" />
+            </div>
+            <div className="form-field">
+              <label className="label">City</label>
+              <input type="text" className="input" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+            </div>
+            <div className="form-field">
+              <label className="label">Phone</label>
+              <input type="text" className="input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+            </div>
+            <div className="form-field">
+              <label className="label">GSTIN</label>
+              <input type="text" className="input" value={form.gstin} onChange={(e) => setForm({ ...form, gstin: e.target.value })} placeholder="15-char GSTIN" maxLength={15} />
+            </div>
+            <div className="form-field">
+              <label className="label">State Code</label>
+              <input type="text" className="input" value={form.stateCode} onChange={(e) => setForm({ ...form, stateCode: e.target.value })} placeholder="e.g. 03" maxLength={2} />
+            </div>
+            <div className="form-field">
+              <label className="label">Address</label>
+              <input type="text" className="input" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Street / area" />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button type="submit" className="btn-primary" disabled={create.isPending}>{create.isPending ? 'Adding…' : 'Add Party'}</button>
+            {error && <span className="text-red-500 text-sm">{error}</span>}
+          </div>
+        </form>
+      </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-auto">
-        {isLoading ? <p className="p-4 text-gray-400">Loading…</p> : (
-          <table className="table-grid">
-            <thead><tr><th>Name</th><th>City</th><th>Phone</th><th>Actions</th></tr></thead>
+      <div className="card p-0 overflow-hidden">
+        {isLoading ? <p className="p-5 text-gray-400">Loading…</p> : (
+          <table className="data-table">
+            <thead>
+              <tr><th>Party Name</th><th>City</th><th>Phone</th><th>GSTIN</th><th>State</th><th>Actions</th></tr>
+            </thead>
             <tbody>
               {parties.map((p: any) => (
                 <tr key={p.id}>
                   <td className="font-medium">{p.name}</td>
-                  <td>{p.city}</td>
-                  <td>{p.phone}</td>
-                  <td className="flex gap-3">
-                    <button onClick={() => openRates(p)} className="text-blue-600 hover:underline text-xs">Rates</button>
-                    <Link to={`/parties/${p.id}/ledger`} className="text-green-600 hover:underline text-xs">Ledger</Link>
+                  <td className="text-gray-500">{p.city}</td>
+                  <td className="text-gray-500">{p.phone}</td>
+                  <td className="font-mono text-xs text-gray-500">{p.gstin || '—'}</td>
+                  <td><span className="badge badge-gray">{p.stateCode || '—'}</span></td>
+                  <td>
+                    <div className="flex gap-3">
+                      <button onClick={() => openRates(p)} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium">Rates</button>
+                      <Link to={`/parties/${p.id}/ledger`} className="text-green-600 hover:text-green-800 text-xs font-medium">Ledger</Link>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -67,41 +110,41 @@ export function PartiesPage() {
         )}
       </div>
 
-      {/* Rate editor modal */}
       {selectedParty && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl max-h-[80vh] flex flex-col">
-            <h2 className="font-bold text-lg mb-4">Rates — {selectedParty.name}</h2>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-bold text-lg">Rate Matrix — {selectedParty.name}</h2>
+              <button onClick={() => setSelectedParty(null)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            </div>
             <div className="overflow-y-auto flex-1">
-              <table className="table-grid">
-                <thead><tr><th>Code</th><th>Item</th><th>Rate (₹)</th></tr></thead>
+              <table className="data-table">
+                <thead><tr><th>Code</th><th>Item</th><th>Rate (₹/unit)</th></tr></thead>
                 <tbody>
                   {items.map((item: any) => (
                     <tr key={item.id}>
-                      <td className="font-mono">{item.code}</td>
+                      <td><span className="badge badge-blue">{item.code}</span></td>
                       <td>{item.name}</td>
-                      <td><input type="number" step="0.01" value={rates[item.id] ?? ''} onChange={(e) => setRates({ ...rates, [item.id]: e.target.value })} className="border border-gray-300 rounded px-2 py-0.5 w-24 text-sm" placeholder="—" /></td>
+                      <td>
+                        <input
+                          type="number" step="0.01" min="0"
+                          value={rates[item.id] ?? ''}
+                          onChange={(e) => setRates({ ...rates, [item.id]: e.target.value })}
+                          className="input w-28" placeholder="—"
+                        />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <div className="flex gap-3 mt-4">
-              <button onClick={saveRates} disabled={saving} className="bg-brand-600 text-white px-4 py-2 rounded hover:bg-brand-700 text-sm">{saving ? 'Saving…' : 'Save Rates'}</button>
-              <button onClick={() => setSelectedParty(null)} className="text-gray-500 hover:underline text-sm">Cancel</button>
+            <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
+              <button onClick={saveRates} disabled={saving} className="btn-primary">{saving ? 'Saving…' : 'Save Rates'}</button>
+              <button onClick={() => setSelectedParty(null)} className="btn-secondary">Cancel</button>
             </div>
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-function Field({ label, value, onChange, required, width = 'w-32' }: any) {
-  return (
-    <div className={`flex flex-col gap-0.5 ${width}`}>
-      <label className="text-xs font-medium text-gray-600">{label}</label>
-      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} required={required} className="border border-gray-300 rounded px-2 py-1 text-sm" />
     </div>
   );
 }
