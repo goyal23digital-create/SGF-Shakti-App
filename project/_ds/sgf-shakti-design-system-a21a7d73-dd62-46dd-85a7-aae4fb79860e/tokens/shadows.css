@@ -1,0 +1,21 @@
+/* SGF Shakti — Elevation / shadow tokens
+   Cool, navy-tinted shadows (not pure black) so cards feel lifted off the slate page.
+   Brand shadows tint with orange / blue for CTA emphasis. */
+
+:root {
+  --shadow-xs:  0 1px 2px rgba(11, 33, 66, 0.06);
+  --shadow-sm:  0 1px 3px rgba(11, 33, 66, 0.08), 0 1px 2px rgba(11, 33, 66, 0.06);
+  --shadow-md:  0 4px 10px rgba(11, 33, 66, 0.08), 0 2px 4px rgba(11, 33, 66, 0.06);
+  --shadow-lg:  0 12px 28px rgba(11, 33, 66, 0.12), 0 4px 8px rgba(11, 33, 66, 0.06);
+  --shadow-xl:  0 24px 56px rgba(11, 33, 66, 0.18), 0 8px 16px rgba(11, 33, 66, 0.08);
+
+  /* Tinted action shadows */
+  --shadow-accent: 0 8px 20px rgba(224, 121, 12, 0.32);
+  --shadow-brand:  0 8px 20px rgba(10, 63, 134, 0.30);
+
+  /* Inset / sunken */
+  --shadow-inset: inset 0 1px 2px rgba(11, 33, 66, 0.10);
+
+  /* Ring */
+  --ring-focus: 0 0 0 3px rgba(44, 125, 238, 0.40);
+}

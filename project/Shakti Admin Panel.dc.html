@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/radius.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/shadows.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/motion.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/tokens/base.css">
+  <link rel="stylesheet" href="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="lucide-icon.js"></script>
+  <script src="_ds/sgf-shakti-design-system-a21a7d73-dd62-46dd-85a7-aae4fb79860e/_ds_bundle.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; }
+    body { background: var(--slate-50); }
+    @keyframes ap-toast-in { 0% { transform: translateY(-14px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+    @keyframes ap-grow { 0% { transform: scaleY(0); } 100% { transform: scaleY(1); } }
+  </style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;font-family:var(--font-body);color:var(--text-strong)">
+
+  <!-- ===== SIDEBAR ===== -->
+  <div style="width:232px;flex:none;background:{{ sbBg }};border-right:1px solid {{ sbBorder }};display:flex;flex-direction:column;position:sticky;top:0;height:100vh">
+    <div style="display:flex;align-items:center;gap:10px;padding:18px 18px 16px;border-bottom:1px solid {{ sbDivider }}">
+      <sc-if value="{{ inkSidebar }}" hint-placeholder-val="{{ false }}"><img src="assets/logo-mark-white.png" alt="" style="width:34px;height:34px;object-fit:contain;border-radius:9px"></sc-if>
+      <sc-if value="{{ notInkSidebar }}" hint-placeholder-val="{{ true }}"><img src="assets/logo-mark.png" alt="" style="width:34px;height:34px;object-fit:contain;border-radius:9px"></sc-if>
+      <div>
+        <div style="font-family:var(--font-condensed);font-weight:700;letter-spacing:0.16em;text-transform:uppercase;font-size:11px;color:{{ sbEyebrow }}">Shakti Club</div>
+        <div style="font-size:11.5px;color:{{ sbMuted }}">Admin · Head Office</div>
+      </div>
+    </div>
+    <div style="padding:12px 10px;display:flex;flex-direction:column;gap:2px;flex:1">
+      <sc-for list="{{ navItems }}" as="nv" hint-placeholder-count="6">
+        <div onClick="{{ nv.go }}" style-hover="background:var(--slate-50)" style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;cursor:pointer;background:{{ nv.bg }}">
+          <l-icon name="{{ nv.icon }}" size="18" color="{{ nv.iconColor }}" stroke-width="1.9"></l-icon>
+          <span style="flex:1;font-size:13.5px;font-weight:{{ nv.weight }};color:{{ nv.color }}">{{ nv.label }}</span>
+          <sc-if value="{{ nv.count }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size:10.5px;font-weight:800;background:var(--orange-500);color:#fff;border-radius:999px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 5px">{{ nv.count }}</span>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding:14px 18px;border-top:1px solid {{ sbDivider }};display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;border-radius:50%;background:{{ sbAvatarBg }};color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:12.5px">CG</div>
+      <div style="font-size:12px;color:{{ sbText }}"><b>Chetan Goyal</b><br><span style="color:{{ sbMuted }}">Managing Director</span></div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN ===== -->
+  <div style="flex:1;min-width:0;position:relative">
+
+    <!-- toast -->
+    <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed;top:18px;right:24px;z-index:60;background:var(--blue-900);color:#fff;border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-lg);animation:ap-toast-in 0.3s ease">
+        <l-icon name="check-circle-2" size="18" color="#FFBA1F"></l-icon>
+        <span style="font-size:13px;font-weight:600">{{ toastMsg }}</span>
+      </div>
+    </sc-if>
+
+    <!-- topbar -->
+    <div style="display:flex;align-items:center;gap:14px;padding:16px 28px;background:#fff;border-bottom:1px solid var(--slate-200);position:sticky;top:0;z-index:10">
+      <div style="font-family:var(--font-display);font-weight:800;font-size:19px;flex:1">{{ viewTitle }}</div>
+      <span style="font-size:12px;color:var(--text-muted)">July 2026 · live data (mock)</span>
+      <span style="font-size:11.5px;font-weight:700;color:{{ costColor }};background:{{ costBg }};border-radius:999px;padding:5px 12px">{{ costChip }}</span>
+    </div>
+
+    <!-- ======== DASHBOARD ======== -->
+    <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="Admin Dashboard" style="padding:{{ contentPad }}">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:{{ gridGap }}">
+          <sc-for list="{{ stats }}" as="st" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:{{ statPad }};box-shadow:var(--shadow-xs)">
+              <div style="display:flex;align-items:center;gap:8px;font-family:var(--font-condensed);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;font-size:10.5px;color:var(--text-muted)">
+                <l-icon name="{{ st.icon }}" size="14" color="#6B7A8C"></l-icon>{{ st.label }}
+              </div>
+              <div style="font-family:var(--font-display);font-weight:800;font-size:{{ statValueSize }};margin-top:8px">{{ st.value }}</div>
+              <div style="font-size:11.5px;margin-top:3px;color:{{ st.deltaColor }};font-weight:600">{{ st.delta }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:{{ gridGap }};margin-top:{{ gridGap }}">
+          <!-- cost chart -->
+          <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:18px;box-shadow:var(--shadow-xs)">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <div style="font-weight:800;font-size:14.5px">Program cost vs billing</div>
+              <div style="font-size:11.5px;color:var(--text-muted)">auto-alert above 1.25%</div>
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:18px;height:150px;margin-top:18px;padding:0 6px;border-bottom:1px solid var(--slate-200);position:relative">
+              <div style="position:absolute;left:0;right:0;bottom:75%;border-top:1.5px dashed var(--red-500);opacity:0.55"></div>
+              <span style="position:absolute;right:4px;bottom:76%;font-size:10px;color:var(--red-500);font-weight:700">1.25% cap</span>
+              <sc-for list="{{ costBars }}" as="cb" hint-placeholder-count="6">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end">
+                  <span style="font-size:10.5px;font-weight:700;color:var(--text-body)">{{ cb.pct }}</span>
+                  <div style="width:100%;max-width:44px;height:{{ cb.h }};border-radius:8px 8px 0 0;background:{{ cb.bg }};transform-origin:bottom;animation:ap-grow 0.7s cubic-bezier(0.2,0.6,0.2,1)"></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:18px;padding:8px 6px 0">
+              <sc-for list="{{ costBars }}" as="cb2" hint-placeholder-count="6">
+                <div style="flex:1;text-align:center;font-size:10.5px;color:var(--text-muted)">{{ cb2.month }}</div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- liability -->
+          <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:18px;box-shadow:var(--shadow-xs);display:flex;flex-direction:column">
+            <div style="font-weight:800;font-size:14.5px">Points liability</div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:12px">
+              <span style="font-family:var(--font-display);font-weight:800;font-size:30px">{{ liabValue }}</span>
+              <span style="font-size:12px;color:var(--text-muted)">{{ liabSub }}</span>
+            </div>
+            <div style="margin-top:14px;display:flex;flex-direction:column;gap:9px;font-size:12.5px">
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Earned this month</span><b>+2.94L SP</b></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Redeemed this month</span><b>−1.86L SP</b></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Expiring in 60 days</span><b style="color:var(--amber-600)">{{ liabExpiring }}</b></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Clawed back (returns)</span><b>−0.06L SP</b></div>
+            </div>
+            <div style="margin-top:auto;padding-top:12px;font-size:11.5px;color:var(--text-muted);border-top:1px solid var(--slate-100)">Expiry reminders at 60/30/7 days are on. CA review scheduled 28 Jul.</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:{{ gridGap }};margin-top:{{ gridGap }}">
+          <!-- sell-through -->
+          <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:18px;box-shadow:var(--shadow-xs)">
+            <div style="display:flex;align-items:baseline;justify-content:space-between">
+              <div style="font-weight:800;font-size:14.5px">Sell-through from QR scans</div>
+              <span style="font-size:11.5px;color:var(--text-link);font-weight:600;cursor:pointer">Open map</span>
+            </div>
+            <div style="margin-top:12px;border:1.5px dashed var(--slate-300);border-radius:12px;height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--text-faint)">
+              <l-icon name="map" size="28" color="#9AA8B8" stroke-width="1.5"></l-icon>
+              <span style="font-size:12px">Punjab heat map placeholder — 8,420 scans this week</span>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px">
+              <span style="font-size:11px;font-weight:700;background:var(--blue-50);color:var(--brand-primary);border-radius:999px;padding:4px 10px">Ludhiana 34%</span>
+              <span style="font-size:11px;font-weight:700;background:var(--blue-50);color:var(--brand-primary);border-radius:999px;padding:4px 10px">Jalandhar 22%</span>
+              <span style="font-size:11px;font-weight:700;background:var(--blue-50);color:var(--brand-primary);border-radius:999px;padding:4px 10px">Amritsar 18%</span>
+              <span style="font-size:11px;font-weight:700;background:var(--slate-100);color:var(--slate-500);border-radius:999px;padding:4px 10px">Other 26%</span>
+            </div>
+          </div>
+          <!-- activity -->
+          <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:18px;box-shadow:var(--shadow-xs)">
+            <div style="font-weight:800;font-size:14.5px;margin-bottom:11px">Live activity</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ activity }}" as="a" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;gap:10px;font-size:12.5px">
+                  <div style="width:28px;height:28px;border-radius:9px;background:{{ a.bg }};display:flex;align-items:center;justify-content:center;flex:none">
+                    <l-icon name="{{ a.icon }}" size="14" color="{{ a.color }}"></l-icon>
+                  </div>
+                  <span style="flex:1;color:var(--text-body)">{{ a.text }}</span>
+                  <span style="font-size:10.5px;color:var(--text-faint)">{{ a.time }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ======== DEALERS ======== -->
+    <sc-if value="{{ isDealers }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Dealer Approvals" style="padding:{{ contentPad }}">
+        <div style="font-weight:800;font-size:14.5px;margin-bottom:11px">Pending KYC approvals</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ pending }}" as="pd" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-xs)">
+              <div style="width:40px;height:40px;border-radius:50%;background:var(--slate-100);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:14px;color:var(--slate-600)">{{ pd.initials }}</div>
+              <div style="flex:1">
+                <div style="font-weight:700;font-size:14px">{{ pd.name }}</div>
+                <div style="font-size:12px;color:var(--text-muted)">{{ pd.sub }}</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <span style="font-size:10.5px;font-weight:700;color:var(--status-success);background:var(--green-50);border-radius:999px;padding:4px 10px">GST ✓</span>
+                <span style="font-size:10.5px;font-weight:700;color:var(--status-success);background:var(--green-50);border-radius:999px;padding:4px 10px">Shop photo ✓</span>
+                <span style="font-size:10.5px;font-weight:700;color:{{ pd.refColor }};background:{{ pd.refBg }};border-radius:999px;padding:4px 10px">{{ pd.refLabel }}</span>
+              </div>
+              <sc-if value="{{ pd.isPending }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;gap:8px">
+                  <div onClick="{{ pd.approve }}" style-hover="filter:brightness(1.05)" style="background:var(--grad-orange);color:#fff;border-radius:999px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:var(--shadow-accent)">Approve</div>
+                  <div onClick="{{ pd.reject }}" style-hover="background:var(--slate-100)" style="border:1px solid var(--slate-300);border-radius:999px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--text-body)">Hold</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ pd.isDone }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size:12px;font-weight:700;color:{{ pd.doneColor }}">{{ pd.doneLabel }}</span>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="font-weight:800;font-size:14.5px;margin:22px 0 11px">Active dealers · 368</div>
+        <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-xs)">
+          <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 1fr 1fr;padding:11px 16px;background:var(--slate-50);border-bottom:1px solid var(--slate-100);font-family:var(--font-condensed);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;font-size:10.5px;color:var(--text-muted)">
+            <span>Dealer</span><span>District</span><span>Tier</span><span>12-mo billing</span><span>SP balance</span><span>Last order</span>
+          </div>
+          <sc-for list="{{ dealers }}" as="d" hint-placeholder-count="6">
+            <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 1fr 1fr;padding:{{ rowPad }};border-bottom:1px solid var(--slate-100);font-size:12.5px;align-items:center">
+              <span style="font-weight:700">{{ d.name }}</span>
+              <span style="color:var(--text-muted)">{{ d.district }}</span>
+              <span><span style="font-size:10.5px;font-weight:800;border-radius:999px;padding:3px 10px;background:{{ d.tierBg }};color:{{ d.tierColor }}">{{ d.tier }}</span></span>
+              <span>{{ d.billing }}</span>
+              <span style="font-weight:700;color:var(--brand-accent-strong)">{{ d.sp }}</span>
+              <span style="color:var(--text-muted)">{{ d.last }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ======== MISSIONS ======== -->
+    <sc-if value="{{ isMissions }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Mission Builder" style="padding:{{ contentPad }}">
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:14px">
+          <div>
+            <div style="font-weight:800;font-size:14.5px;margin-bottom:11px">Live missions · 3 of 3 slots</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ liveMissions }}" as="lm" hint-placeholder-count="3">
+                <div style="background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:15px 16px;box-shadow:var(--shadow-xs)">
+                  <div style="display:flex;align-items:center;gap:11px">
+                    <div style="width:36px;height:36px;border-radius:11px;background:var(--blue-50);display:flex;align-items:center;justify-content:center"><l-icon name="{{ lm.icon }}" size="17" color="#0A52B4"></l-icon></div>
+                    <div style="flex:1">
+                      <div style="font-weight:700;font-size:13.5px">{{ lm.title }}</div>
+                      <div style="font-size:11.5px;color:var(--text-muted)">{{ lm.sub }}</div>
+                    </div>
+                    <span style="font-size:11px;font-weight:800;color:var(--brand-accent-strong);background:var(--orange-50);border-radius:999px;padding:4px 10px">{{ lm.reward }}</span>
+                  </div>
+                  <div style="margin-top:11px;height:6px;border-radius:999px;background:var(--slate-100);overflow:hidden">
+                    <div style="height:100%;border-radius:999px;background:var(--grad-orange);width:{{ lm.pct }}"></div>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:5px">
+                    <span>{{ lm.uptake }}</span><span>{{ lm.ends }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-weight:800;font-size:14.5px;margin:20px 0 11px">Queued for August</div>
+            <div style="background:#fff;border:1.5px dashed var(--slate-300);border-radius:14px;padding:14px 16px;font-size:12.5px;color:var(--text-muted)">Diwali display contest — best decorated SGF corner wins 5,000 SP · goes live 15 Sep</div>
+          </div>
+
+          <!-- builder -->
+          <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:18px;box-shadow:var(--shadow-xs);align-self:start">
+            <div style="font-weight:800;font-size:14.5px">New mission</div>
+            <div style="font-size:11.5px;color:var(--text-muted);margin-top:3px">Whatever the business needs this month.</div>
+            <div style="display:flex;flex-direction:column;gap:11px;margin-top:14px">
+              <div>
+                <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);margin-bottom:5px">TYPE</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ missionTypes }}" as="mt" hint-placeholder-count="4">
+                    <div onClick="{{ mt.set }}" style="padding:6px 12px;border-radius:999px;font-size:11.5px;font-weight:700;cursor:pointer;border:1px solid {{ mt.border }};background:{{ mt.bg }};color:{{ mt.color }}">{{ mt.label }}</div>
+                  </sc-for>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);margin-bottom:5px">GOAL</div>
+                <div style="border:1px solid var(--slate-300);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text-body)">{{ builderGoal }}</div>
+              </div>
+              <div style="display:flex;gap:10px">
+                <div style="flex:1">
+                  <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);margin-bottom:5px">REWARD</div>
+                  <div style="border:1px solid var(--slate-300);border-radius:10px;padding:10px 12px;font-size:13px">{{ builderReward }}</div>
+                </div>
+                <div style="flex:1">
+                  <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);margin-bottom:5px">DEADLINE</div>
+                  <div style="border:1px solid var(--slate-300);border-radius:10px;padding:10px 12px;font-size:13px">31 Aug</div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:11.5px;font-weight:700;color:var(--text-muted);margin-bottom:5px">AUDIENCE</div>
+                <div style="display:flex;gap:6px">
+                  <span style="font-size:11px;font-weight:700;background:var(--blue-600);color:#fff;border-radius:999px;padding:5px 11px">All tiers</span>
+                  <span style="font-size:11px;font-weight:700;background:var(--slate-100);color:var(--slate-500);border-radius:999px;padding:5px 11px">Gold+</span>
+                  <span style="font-size:11px;font-weight:700;background:var(--slate-100);color:var(--slate-500);border-radius:999px;padding:5px 11px">District</span>
+                </div>
+              </div>
+              <div onClick="{{ publishMission }}" style-hover="filter:brightness(1.05)" style="margin-top:4px;background:var(--grad-orange);color:#fff;border-radius:999px;padding:12px;text-align:center;font-weight:800;font-size:13.5px;cursor:pointer;box-shadow:var(--shadow-accent)">Publish to 368 dealers</div>
+              <div style="font-size:11px;color:var(--text-muted);text-align:center">Also broadcast on WhatsApp · max 3 live at once</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ======== REWARDS QUEUE ======== -->
+    <sc-if value="{{ isRewardsQ }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Reward Fulfilment" style="padding:{{ contentPad }}">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:11px">
+          <div style="font-weight:800;font-size:14.5px">Fulfilment queue</div>
+          <div style="font-size:12px;color:var(--text-muted)">SLA: 14 days · every fulfilled reward → photo → Bulletin</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-xs)">
+          <div style="display:grid;grid-template-columns:1.6fr 1.6fr 1fr 1fr 1.1fr;padding:11px 16px;background:var(--slate-50);border-bottom:1px solid var(--slate-100);font-family:var(--font-condensed);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;font-size:10.5px;color:var(--text-muted)">
+            <span>Reward</span><span>Dealer</span><span>SP</span><span>Requested</span><span>Status</span>
+          </div>
+          <sc-for list="{{ queue }}" as="q" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:1.6fr 1.6fr 1fr 1fr 1.1fr;padding:{{ rowPad }};border-bottom:1px solid var(--slate-100);font-size:12.5px;align-items:center">
+              <span style="font-weight:700">{{ q.reward }}</span>
+              <span style="color:var(--text-muted)">{{ q.dealer }}</span>
+              <span style="font-weight:700;color:var(--brand-accent-strong)">{{ q.sp }}</span>
+              <span style="color:var(--text-muted)">{{ q.date }}</span>
+              <sc-if value="{{ q.isPending }}" hint-placeholder-val="{{ true }}">
+                <div onClick="{{ q.fulfil }}" style-hover="filter:brightness(1.05)" style="background:var(--blue-600);color:#fff;border-radius:999px;padding:6px 14px;font-size:11.5px;font-weight:700;cursor:pointer;justify-self:start">Mark fulfilled</div>
+              </sc-if>
+              <sc-if value="{{ q.isDone }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size:11.5px;font-weight:700;color:var(--status-success);justify-self:start">Fulfilled ✓</span>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top:14px;border-radius:14px;background:var(--cream-50);border:1px solid var(--sand-200);padding:13px 16px;font-size:12.5px;color:var(--text-body);display:flex;gap:10px;align-items:center">
+          <l-icon name="info" size="16" color="#8E4A0C"></l-icon>
+          Credit notes auto-apply to the dealer ledger — no manual step. Physical rewards route to Xoxoday-class fulfilment API in Phase 2.
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ======== RECONCILIATION ======== -->
+    <sc-if value="{{ isRecon }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Reconciliation" style="padding:{{ contentPad }}">
+        <div style="font-weight:800;font-size:14.5px;margin-bottom:11px">Tally sync — paid invoices awaiting SP release</div>
+        <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-xs)">
+          <div style="display:grid;grid-template-columns:1.2fr 1.8fr 1fr 1fr 1fr 1.1fr;padding:11px 16px;background:var(--slate-50);border-bottom:1px solid var(--slate-100);font-family:var(--font-condensed);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;font-size:10.5px;color:var(--text-muted)">
+            <span>Invoice</span><span>Dealer</span><span>Value</span><span>Paid on</span><span>SP due</span><span>Action</span>
+          </div>
+          <sc-for list="{{ recon }}" as="rc" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:1.2fr 1.8fr 1fr 1fr 1fr 1.1fr;padding:{{ rowPad }};border-bottom:1px solid var(--slate-100);font-size:12.5px;align-items:center">
+              <span style="font-weight:700">{{ rc.no }}</span>
+              <span style="color:var(--text-muted)">{{ rc.dealer }}</span>
+              <span>{{ rc.value }}</span>
+              <span style="color:var(--text-muted)">{{ rc.paid }}</span>
+              <span style="font-weight:700;color:var(--brand-accent-strong)">{{ rc.sp }}</span>
+              <sc-if value="{{ rc.isPending }}" hint-placeholder-val="{{ true }}">
+                <div onClick="{{ rc.release }}" style-hover="filter:brightness(1.05)" style="background:var(--grad-orange);color:#fff;border-radius:999px;padding:6px 14px;font-size:11.5px;font-weight:700;cursor:pointer;justify-self:start;box-shadow:var(--shadow-accent)">Release SP</div>
+              </sc-if>
+              <sc-if value="{{ rc.isDone }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size:11.5px;font-weight:700;color:var(--status-success);justify-self:start">Released ✓</span>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top:14px;font-size:12px;color:var(--text-muted);line-height:1.6">Rule 1 of the programme: SP release triggers only on reconciled payment — never on booking. Early-payment bonus (+25%) is computed automatically from due-date vs paid-date. Returns claw back at credit-note issue.</div>
+      </div>
+    </sc-if>
+
+    <!-- ======== BROADCAST ======== -->
+    <sc-if value="{{ isBroadcast }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Broadcast" style="padding:{{ contentPad }};max-width:760px">
+        <div style="background:#fff;border:1px solid var(--slate-200);border-radius:16px;padding:20px;box-shadow:var(--shadow-xs)">
+          <div style="font-weight:800;font-size:14.5px">Compose broadcast</div>
+          <div style="font-size:11.5px;color:var(--text-muted);margin-top:3px">In-app notification + WhatsApp mirror.</div>
+          <div style="display:flex;gap:6px;margin-top:14px">
+            <span style="font-size:11px;font-weight:700;background:var(--blue-600);color:#fff;border-radius:999px;padding:5px 12px">All dealers · 368</span>
+            <span style="font-size:11px;font-weight:700;background:var(--slate-100);color:var(--slate-500);border-radius:999px;padding:5px 12px">Silver · 118</span>
+            <span style="font-size:11px;font-weight:700;background:var(--slate-100);color:var(--slate-500);border-radius:999px;padding:5px 12px">Gold+ · 62</span>
+            <span style="font-size:11px;font-weight:700;background:var(--slate-100);color:var(--slate-500);border-radius:999px;padding:5px 12px">Inactive 30d · 41</span>
+          </div>
+          <div style="margin-top:12px;border:1px solid var(--slate-300);border-radius:12px;padding:13px 14px;font-size:13.5px;color:var(--text-body);line-height:1.55">Shakti Club update: Heritage Stool mission crosses 6,400 units statewide. 25 days left on 2× SP — full-truck orders also earn +500 SP. जितना शक्ति बेचोगे, उतनी शक्ति कमाओगे।</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+            <div onClick="{{ sendBroadcast }}" style-hover="filter:brightness(1.05)" style="background:var(--grad-orange);color:#fff;border-radius:999px;padding:11px 22px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:var(--shadow-accent)">Send to 368 dealers</div>
+            <span style="font-size:11.5px;color:var(--text-muted)">Best time: 8–9 pm — 2.1× open rate</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1440, &quot;height&quot;: 960 },
+  &quot;scenario&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;steady&quot;, &quot;pilot&quot;, &quot;cap-breach&quot;], &quot;default&quot;: &quot;steady&quot;, &quot;tsType&quot;: &quot;'steady' | 'pilot' | 'cap-breach'&quot;, &quot;section&quot;: &quot;Data scenario&quot; },
+  &quot;density&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;comfortable&quot;, &quot;compact&quot;], &quot;default&quot;: &quot;comfortable&quot;, &quot;tsType&quot;: &quot;'comfortable' | 'compact'&quot;, &quot;section&quot;: &quot;Layout&quot; },
+  &quot;inkSidebar&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Look&quot; }
+}">
+class Component extends DCLogic {
+  state = {
+    view: 'dashboard',
+    toast: null,
+    pendingStatus: {},
+    queueDone: {},
+    reconDone: {},
+    missionType: 'sku',
+  };
+
+  showToast(msg) {
+    if (this._t) clearTimeout(this._t);
+    this.setState({ toast: msg });
+    this._t = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+
+  renderVals() {
+    const s = this.state;
+    const scenario = this.props.scenario ?? 'steady';
+    const breach = scenario === 'cap-breach';
+    const pilot = scenario === 'pilot';
+    const compact = (this.props.density ?? 'comfortable') === 'compact';
+    const ink = this.props.inkSidebar ?? false;
+
+    const navDefs = [
+      ['dashboard', 'layout-dashboard', 'Dashboard', 0],
+      ['dealers', 'users', 'Dealers & KYC', 3],
+      ['missions', 'target', 'Missions', 0],
+      ['rewardsq', 'gift', 'Reward fulfilment', 5],
+      ['recon', 'receipt-indian-rupee', 'Reconciliation', 4],
+      ['broadcast', 'megaphone', 'Broadcast', 0],
+    ];
+    const titles = { dashboard: 'Programme dashboard', dealers: 'Dealers & KYC', missions: 'Mission builder', rewardsq: 'Reward fulfilment', recon: 'Points reconciliation', broadcast: 'Broadcast composer' };
+    const navItems = navDefs.map(([id, icon, label, count]) => {
+      const on = s.view === id;
+      return {
+        icon, label, count: count > 0 ? count : false,
+        go: () => this.setState({ view: id }),
+        bg: on ? (ink ? 'rgba(255,255,255,0.14)' : 'var(--blue-50)') : 'transparent',
+        color: ink ? (on ? '#fff' : 'rgba(255,255,255,0.78)') : (on ? 'var(--brand-primary)' : 'var(--text-body)'),
+        iconColor: ink ? (on ? '#FFBA1F' : 'rgba(255,255,255,0.65)') : (on ? '#0A52B4' : '#6B7A8C'),
+        weight: on ? 800 : 600,
+      };
+    });
+
+    const statsBy = {
+      steady: [
+        { icon: 'users', label: 'App-active dealers', value: '312 / 368', delta: '85% adoption · target met', deltaColor: 'var(--status-success)' },
+        { icon: 'repeat', label: '45-day repeat rate', value: '68%', delta: '+11 pts vs pre-app', deltaColor: 'var(--status-success)' },
+        { icon: 'timer', label: 'On-time payment', value: '74%', delta: '+18 pts — the sleeper win', deltaColor: 'var(--status-success)' },
+        { icon: 'qr-code', label: 'Carton scans / week', value: '8,420', delta: '61% of dispatched cartons', deltaColor: 'var(--text-muted)' },
+      ],
+      pilot: [
+        { icon: 'users', label: 'Pilot dealers onboard', value: '15 / 15', delta: 'founding members · manual bridge', deltaColor: 'var(--status-success)' },
+        { icon: 'repeat', label: '45-day repeat rate', value: '54%', delta: '+4 pts vs baseline', deltaColor: 'var(--status-success)' },
+        { icon: 'timer', label: 'On-time payment', value: '61%', delta: '+7 pts in 6 weeks', deltaColor: 'var(--status-success)' },
+        { icon: 'qr-code', label: 'Carton scans / week', value: '1,240', delta: 'QR pilot on 2 SKUs', deltaColor: 'var(--text-muted)' },
+      ],
+      'cap-breach': [
+        { icon: 'users', label: 'App-active dealers', value: '341 / 368', delta: '93% adoption', deltaColor: 'var(--status-success)' },
+        { icon: 'repeat', label: '45-day repeat rate', value: '71%', delta: '+14 pts vs pre-app', deltaColor: 'var(--status-success)' },
+        { icon: 'flame', label: 'Programme cost', value: '1.31%', delta: 'OVER CAP — trim festival multiplier', deltaColor: 'var(--status-danger)' },
+        { icon: 'coins', label: 'SP burn this month', value: '4.9L SP', delta: '+38% MoM · scratch odds under review', deltaColor: 'var(--amber-600)' },
+      ],
+    };
+    const stats = statsBy[scenario] || statsBy.steady;
+
+    const costSeries = pilot
+      ? [0.31, 0.44, 0.52, 0.61, 0.68, 0.72]
+      : breach
+        ? [0.96, 1.02, 1.14, 1.21, 1.28, 1.31]
+        : [0.82, 1.14, 0.96, 1.02, 1.21, 1.08];
+    const costBars = ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'].map((month, i) => ({
+      month, pct: costSeries[i].toFixed(2) + '%', v: costSeries[i],
+    })).map((b) => ({
+      ...b,
+      h: Math.round((b.v / 1.6) * 100) + '%',
+      bg: b.v > 1.25 ? 'var(--red-500)' : b.v > 1.15 ? 'var(--amber-500)' : 'var(--grad-blue)',
+    }));
+
+    const activity = [
+      { icon: 'coins', text: 'Gupta Furniture House collected a 250 SP scratch card', time: 'now', bg: 'var(--orange-50)', color: '#E0790C' },
+      { icon: 'arrow-up-right', text: 'Sethi & Sons redeemed ₹5,000 credit note (20,000 SP)', time: '12m', bg: 'var(--blue-50)', color: '#0A52B4' },
+      { icon: 'user-plus', text: 'Referral: Kalsi Home Store → new dealer in Raikot', time: '1h', bg: 'var(--green-50)', color: '#168049' },
+      { icon: 'qr-code', text: '78 cartons scanned against INV-2231, Ludhiana', time: '2h', bg: 'var(--blue-50)', color: '#0A52B4' },
+      { icon: 'trending-up', text: 'Bansal Furniture crossed ₹15L — Gold review queued', time: '4h', bg: 'var(--orange-50)', color: '#E0790C' },
+    ];
+    if (breach) activity.unshift({ icon: 'alert-triangle', text: 'ALERT: programme cost crossed the 1.25% cap — burn review required before the next mission', time: 'now', bg: 'var(--red-50)', color: '#C5363B' });
+
+    const pendingDefs = [
+      { id: 'p1', initials: 'HS', name: 'Harjit Singh Furniture', sub: 'Moga · referred by Mittal Agencies · GSTIN 03AAECH…', ref: true },
+      { id: 'p2', initials: 'OM', name: 'Om Traders', sub: 'Bathinda · walk-in via sales team · GSTIN 03AAACO…', ref: false },
+      { id: 'p3', initials: 'DK', name: 'Deep Karya Home', sub: 'Patiala · referred by Patiala Home Needs · GSTIN 03AAFCD…', ref: true },
+    ];
+    const pending = pendingDefs.map((p) => {
+      const status = s.pendingStatus[p.id];
+      return {
+        ...p,
+        refLabel: p.ref ? 'Referral +1,000 SP' : 'Direct',
+        refColor: p.ref ? 'var(--brand-accent-strong)' : 'var(--slate-500)',
+        refBg: p.ref ? 'var(--orange-50)' : 'var(--slate-100)',
+        isPending: !status,
+        isDone: !!status,
+        doneLabel: status === 'ok' ? 'Approved · welcome kit queued' : 'On hold',
+        doneColor: status === 'ok' ? 'var(--status-success)' : 'var(--amber-600)',
+        approve: () => { this.setState((st) => ({ pendingStatus: { ...st.pendingStatus, [p.id]: 'ok' } })); this.showToast(p.name + ' approved — dealer code issued, 1,000 SP welcome bonus queued'); },
+        reject: () => { this.setState((st) => ({ pendingStatus: { ...st.pendingStatus, [p.id]: 'hold' } })); this.showToast(p.name + ' put on hold'); },
+      };
+    });
+
+    const tierStyle = {
+      'Maha': { bg: 'var(--blue-900)', color: '#FFD68C' },
+      'Gold': { bg: 'var(--orange-50)', color: 'var(--brand-accent-strong)' },
+      'Silver': { bg: 'var(--blue-50)', color: 'var(--brand-primary)' },
+      'Sathi': { bg: 'var(--slate-100)', color: 'var(--slate-600)' },
+    };
+    const dealers = [
+      { name: 'Amritsar Furniture Mart', district: 'Amritsar', tier: 'Maha', billing: '₹41.2L', sp: '38,410', last: '2 days ago' },
+      { name: 'Bansal Furniture', district: 'Ludhiana', tier: 'Gold', billing: '₹14.9L', sp: '31,205', last: 'today' },
+      { name: 'Sethi & Sons', district: 'Ludhiana', tier: 'Gold', billing: '₹16.3L', sp: '12,830', last: 'today' },
+      { name: 'Gupta Furniture House', district: 'Ludhiana', tier: 'Silver', billing: '₹13.7L', sp: '24,380', last: 'today' },
+      { name: 'Mittal Agencies', district: 'Ludhiana', tier: 'Silver', billing: '₹9.4L', sp: '18,960', last: '5 days ago' },
+      { name: 'Kalsi Home Store', district: 'Ludhiana', tier: 'Sathi', billing: '₹4.1L', sp: '6,240', last: '12 days ago' },
+    ].map((d) => ({ ...d, tierBg: tierStyle[d.tier].bg, tierColor: tierStyle[d.tier].color }));
+
+    const liveMissions = [
+      { icon: 'rocket', title: 'Heritage Stool launch — 2× SP', sub: 'SGF-9901 · all tiers', reward: '2× SP', pct: '32%', uptake: '6,400 units · 214 dealers active', ends: 'ends 31 Jul' },
+      { icon: 'wallet', title: 'Early payment fortnight', sub: 'Pay before the 10th', reward: '+25% SP', pct: '58%', uptake: '171 invoices cleared early', ends: 'ends 10 Aug' },
+      { icon: 'camera', title: 'Display photo of the month', sub: 'One approved photo', reward: '+100 SP', pct: '44%', uptake: '162 photos approved', ends: 'ends 31 Jul' },
+    ];
+    const typeDefs = [['sku', 'SKU push'], ['payment', 'Payment'], ['display', 'Display'], ['truck', 'Full truck']];
+    const missionTypes = typeDefs.map(([id, label]) => {
+      const on = s.missionType === id;
+      return {
+        label, set: () => this.setState({ missionType: id }),
+        bg: on ? 'var(--blue-600)' : '#fff',
+        color: on ? '#fff' : 'var(--slate-600)',
+        border: on ? 'var(--blue-600)' : 'var(--slate-300)',
+      };
+    });
+    const builderCopy = {
+      sku: { goal: 'Order 200 units of Sonet (SGF-4410) this month', reward: '2× SP on model' },
+      payment: { goal: 'Clear all invoices before due date in August', reward: '+30% bonus SP' },
+      display: { goal: 'Best decorated SGF corner — photo entry', reward: '5,000 SP prize' },
+      truck: { goal: 'Place one full-truck order (380+ pcs)', reward: '+500 SP flat' },
+    };
+
+    const queueDefs = [
+      { id: 'q1', reward: '₹5,000 credit note', dealer: 'Sethi & Sons · Jagraon', sp: '20,000', date: 'today' },
+      { id: 'q2', reward: 'Silver coin — 5g', dealer: 'Bansal Furniture · Khanna', sp: '14,500', date: 'yesterday' },
+      { id: 'q3', reward: 'Glow sign board', dealer: 'Mittal Agencies · Samrala', sp: '9,500', date: '02 Jul' },
+      { id: 'q4', reward: 'Priority dispatch token', dealer: 'New Punjab Traders', sp: '2,500', date: '01 Jul' },
+      { id: 'q5', reward: 'Branding pack — 50 stickers', dealer: 'Kalsi Home Store · Raikot', sp: '1,800', date: '28 Jun' },
+    ];
+    const queue = queueDefs.map((q) => ({
+      ...q,
+      isPending: !s.queueDone[q.id],
+      isDone: !!s.queueDone[q.id],
+      fulfil: () => { this.setState((st) => ({ queueDone: { ...st.queueDone, [q.id]: true } })); this.showToast(q.reward + ' marked fulfilled — photo request sent for the Bulletin'); },
+    }));
+
+    const reconDefs = [
+      { id: 'r1', no: 'INV-2231', dealer: 'Gupta Furniture House', value: '₹64,200', paid: '04 Jul', sp: '+706 SP' },
+      { id: 'r2', no: 'INV-2258', dealer: 'Bansal Furniture', value: '₹1,12,400', paid: '04 Jul', sp: '+1,461 SP' },
+      { id: 'r3', no: 'INV-2260', dealer: 'Doaba Traders', value: '₹86,900', paid: '03 Jul', sp: '+1,043 SP' },
+      { id: 'r4', no: 'INV-2249', dealer: 'Patiala Home Needs', value: '₹58,300', paid: '03 Jul', sp: '+641 SP' },
+    ];
+    const recon = reconDefs.map((rc) => ({
+      ...rc,
+      isPending: !s.reconDone[rc.id],
+      isDone: !!s.reconDone[rc.id],
+      release: () => { this.setState((st) => ({ reconDone: { ...st.reconDone, [rc.id]: true } })); this.showToast(rc.sp + ' released to ' + rc.dealer + ' — in-app + WhatsApp notification sent'); },
+    }));
+
+    return {
+      navItems,
+      viewTitle: titles[s.view],
+      costColor: breach ? 'var(--red-600)' : 'var(--status-success)',
+      costBg: breach ? 'var(--red-50)' : 'var(--green-50)',
+      costChip: breach ? 'Program cost 1.31% — OVER 1.25% CAP' : pilot ? 'Program cost 0.72% · pilot cohort' : 'Program cost 1.08% · cap 1.25%',
+      liabValue: breach ? '₹5.64L' : pilot ? '₹0.38L' : '₹4.21L',
+      liabSub: breach ? '= 22.6L SP outstanding' : pilot ? '= 1.5L SP · 15 dealers' : '= 16.8L SP outstanding',
+      liabExpiring: breach ? '1.12L SP' : pilot ? '0.04L SP' : '0.42L SP',
+      contentPad: compact ? '14px 20px 22px' : '22px 28px 34px',
+      gridGap: compact ? '10px' : '14px',
+      statPad: compact ? '12px 14px' : '16px',
+      statValueSize: compact ? '21px' : '26px',
+      rowPad: compact ? '7px 14px' : '12px 16px',
+      inkSidebar: ink,
+      notInkSidebar: !ink,
+      sbBg: ink ? 'var(--grad-navy)' : '#fff',
+      sbBorder: ink ? 'transparent' : 'var(--slate-200)',
+      sbDivider: ink ? 'rgba(255,255,255,0.12)' : 'var(--slate-100)',
+      sbEyebrow: ink ? '#FFBA1F' : 'var(--brand-accent-strong)',
+      sbText: ink ? '#fff' : 'var(--text-strong)',
+      sbMuted: ink ? 'rgba(255,255,255,0.6)' : 'var(--text-muted)',
+      sbAvatarBg: ink ? 'rgba(255,255,255,0.16)' : 'var(--blue-700)',
+      isDashboard: s.view === 'dashboard',
+      isDealers: s.view === 'dealers',
+      isMissions: s.view === 'missions',
+      isRewardsQ: s.view === 'rewardsq',
+      isRecon: s.view === 'recon',
+      isBroadcast: s.view === 'broadcast',
+      stats, costBars, activity,
+      pending, dealers,
+      liveMissions, missionTypes,
+      builderGoal: builderCopy[s.missionType].goal,
+      builderReward: builderCopy[s.missionType].reward,
+      publishMission: () => this.showToast('Mission slot full — 3 of 3 live. Queue it for August?'),
+      queue, recon,
+      sendBroadcast: () => this.showToast('Broadcast sent to 368 dealers · WhatsApp mirror queued'),
+      toastOn: !!s.toast,
+      toastMsg: s.toast || '',
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+/* SGF Shakti — Radius tokens
+   Moulded furniture = rounded, tactile edges. Radii lean generous & friendly. */
+
+:root {
+  --radius-xs:   4px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;   /* default card */
+  --radius-xl:   22px;
+  --radius-2xl:  30px;
+  --radius-card: var(--radius-lg);
+  --radius-pill: 999px;
+  --radius-round: 50%;
+}

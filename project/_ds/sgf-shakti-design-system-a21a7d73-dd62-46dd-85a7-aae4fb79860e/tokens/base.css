@@ -1,0 +1,30 @@
+/* SGF Shakti — base resets & defaults (applied when consumers opt into .sgf-root or body) */
+
+.sgf-root,
+.sgf body,
+body.sgf {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text-body);
+  background: var(--surface-page);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.sgf-root *,
+.sgf-root *::before,
+.sgf-root *::after { box-sizing: border-box; }
+
+/* Headings use the display family by default inside .sgf-root */
+.sgf-root h1, .sgf-root h2, .sgf-root h3, .sgf-root h4 {
+  font-family: var(--font-display);
+  color: var(--text-strong);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+}
+
+.sgf-root a { color: var(--text-link); text-decoration: none; }
+.sgf-root a:hover { text-decoration: underline; }
