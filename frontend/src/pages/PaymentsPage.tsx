@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
-import { usePayments, useCreatePayment, useVoidPayment, useParties, usePartyBalances } from '../api/hooks';
+import { useState, useRef } from 'react';
+import { usePayments, useCreatePayment, useUpdatePayment, useVoidPayment, useParties, usePartyBalances } from '../api/hooks';
 import { FySelector } from '../components/FySelector';
 
 function today() { return new Date().toISOString().slice(0, 10); }
+
+const EMPTY = { date: today(), partyId: '', amount: '', paymentMode: 'CASH', remarks: '' };
 
 export function PaymentsPage() {
   const [fy, setFy] = useState('2026-27');
@@ -10,19 +12,48 @@ export function PaymentsPage() {
   const { data: parties = [] } = useParties();
   const { data: balances = [] } = usePartyBalances(fy);
   const create = useCreatePayment();
+  const update = useUpdatePayment();
   const voidPayment = useVoidPayment();
-  const [form, setForm] = useState({ date: today(), partyId: '', amount: '', paymentMode: 'CASH', remarks: '' });
+  const [form, setForm] = useState(EMPTY);
   const [error, setError] = useState('');
+  const [editId, setEditId] = useState<number | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const selectedBalance = balances.find((b: any) => String(b.id) === form.partyId);
   const outstanding = selectedBalance ? parseFloat(selectedBalance.outstanding) : null;
 
+  function startEdit(r: any) {
+    setError('');
+    setForm({
+      date: r.date?.slice(0, 10) ?? today(),
+      partyId: String(r.partyId ?? r.party?.id ?? ''),
+      amount: String(parseFloat(r.amount ?? 0) || 0),
+      paymentMode: r.paymentMode ?? 'CASH',
+      remarks: r.remarks ?? '',
+    });
+    setEditId(r.id);
+    formRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function cancelEdit() {
+    setEditId(null);
+    setForm({ ...EMPTY, date: today() });
+    setError('');
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
-    create.mutateAsync({ ...form, fyYear: fy })
-      .then(() => setForm((f) => ({ ...f, amount: '', remarks: '' })))
-      .catch((e: any) => setError(e.response?.data?.error ?? 'Error'));
+    const payload = { ...form, fyYear: fy };
+    if (editId !== null) {
+      update.mutateAsync({ id: editId, ...payload })
+        .then(() => { setEditId(null); setForm({ ...EMPTY, date: today() }); })
+        .catch((e: any) => setError(e.response?.data?.error ?? 'Error'));
+    } else {
+      create.mutateAsync(payload)
+        .then(() => setForm((f) => ({ ...f, amount: '', remarks: '' })))
+        .catch((e: any) => setError(e.response?.data?.error ?? 'Error'));
+    }
   }
 
   const total = rows.reduce((s: number, r: any) => s + parseFloat(r.amount), 0);
@@ -41,7 +72,13 @@ export function PaymentsPage() {
 
       <div className="card">
         <h2 className="text-sm font-semibold text-gray-700 mb-4">Record Payment</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} ref={formRef}>
+          {editId !== null && (
+            <div className="flex items-center gap-3 mb-4 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm font-medium">
+              <span>✏️ Editing entry #{editId} — saving will overwrite it</span>
+              <button type="button" className="btn-secondary" onClick={cancelEdit}>Cancel</button>
+            </div>
+          )}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             <div className="form-field">
               <label className="label">Date</label>
@@ -79,7 +116,9 @@ export function PaymentsPage() {
               <label className="label">Remarks</label>
               <input type="text" className="input" value={form.remarks} onChange={(e) => setForm({ ...form, remarks: e.target.value })} placeholder="Optional" />
             </div>
-            <button type="submit" className="btn-primary" disabled={create.isPending}>{create.isPending ? 'Saving…' : 'Add Payment'}</button>
+            <button type="submit" className="btn-primary" disabled={create.isPending || update.isPending}>
+              {editId !== null ? (update.isPending ? 'Updating…' : 'Update') : (create.isPending ? 'Saving…' : 'Add Payment')}
+            </button>
           </div>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </form>
@@ -99,7 +138,10 @@ export function PaymentsPage() {
                   <td className="text-right font-mono font-semibold text-green-700">₹{parseFloat(r.amount).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</td>
                   <td><span className={`badge ${modeColor[r.paymentMode] ?? 'badge-gray'}`}>{r.paymentMode}</span></td>
                   <td className="text-gray-400 text-xs">{r.remarks}</td>
-                  <td><button onClick={() => { if (confirm('Void this payment?')) voidPayment.mutate(r.id); }} className="btn-danger">Void</button></td>
+                  <td className="whitespace-nowrap">
+                    <button onClick={() => startEdit(r)} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium mr-2">Edit</button>
+                    <button onClick={() => { if (confirm('Void this payment?')) voidPayment.mutate(r.id); }} className="btn-danger">Void</button>
+                  </td>
                 </tr>
               ))}
             </tbody>

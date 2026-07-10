@@ -220,7 +220,10 @@ export function ReturnsPage() {
                     <td><span className="badge badge-gray">{r.gstType} {parseFloat(r.taxPercent || 0).toFixed(0)}%</span></td>
                     <td className="text-right font-mono font-semibold text-green-700">₹{fmt(r.grandTotal)}</td>
                     <td className="text-gray-400 text-xs">{r.remarks}</td>
-                    <td><button onClick={() => { if (confirm('Void this return?')) voidReturn.mutate(r.id); }} className="btn-danger">Void</button></td>
+                    <td className="whitespace-nowrap">
+                      <button onClick={() => startEdit(r)} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium mr-2">Edit</button>
+                      <button onClick={() => { if (confirm('Void this return?')) voidReturn.mutate(r.id); }} className="btn-danger">Void</button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
