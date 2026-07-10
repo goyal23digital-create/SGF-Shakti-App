@@ -11,6 +11,7 @@ import { PaymentsPage } from './pages/PaymentsPage';
 import { ExpensesPage } from './pages/ExpensesPage';
 import { PartyLedgerPage } from './pages/PartyLedgerPage';
 import { ReportsPage } from './pages/ReportsPage';
+import { SettingsPage } from './pages/SettingsPage';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('token');
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="/payments" element={<PaymentsPage />} />
         <Route path="/expenses" element={<ExpensesPage />} />
         <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
     </Routes>
   );

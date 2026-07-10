@@ -6,6 +6,15 @@ export function useMe() {
   return useQuery({ queryKey: ['me'], queryFn: () => api.get('/auth/me').then((r) => r.data) });
 }
 
+// ── Company Settings ──────────────────────────────────────────────────────────
+export function useSettings() {
+  return useQuery({ queryKey: ['settings'], queryFn: () => api.get('/settings').then((r) => r.data), staleTime: 60_000 });
+}
+export function useUpdateSettings() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: (data: object) => api.put('/settings', data).then((r) => r.data), onSuccess: () => qc.invalidateQueries({ queryKey: ['settings'] }) });
+}
+
 // ── Items ─────────────────────────────────────────────────────────────────────
 export function useItems() {
   return useQuery({ queryKey: ['items'], queryFn: () => api.get('/items').then((r) => r.data) });
@@ -50,6 +59,10 @@ export function useVoidInventoryIn() {
   const qc = useQueryClient();
   return useMutation({ mutationFn: (id: number) => api.delete(`/inventory/${id}`).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['inventory-in'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
 }
+export function useUpdateInventoryIn() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: ({ id, ...data }: { id: number } & object) => api.put(`/inventory/${id}`, data).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['inventory-in'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
+}
 
 // ── Sales ─────────────────────────────────────────────────────────────────────
 export function useSales(filters: Record<string, string> = {}) {
@@ -69,6 +82,10 @@ export function useCreateSale() {
 export function useVoidSale() {
   const qc = useQueryClient();
   return useMutation({ mutationFn: (id: number) => api.delete(`/sales/${id}`).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['sales'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
+}
+export function useUpdateSale() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: ({ id, ...data }: { id: number } & object) => api.put(`/sales/${id}`, data).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['sales'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
 }
 
 // ── Returns ───────────────────────────────────────────────────────────────────
@@ -90,6 +107,10 @@ export function useVoidReturn() {
   const qc = useQueryClient();
   return useMutation({ mutationFn: (id: number) => api.delete(`/returns/${id}`).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['returns'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
 }
+export function useUpdateReturn() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: ({ id, ...data }: { id: number } & object) => api.put(`/returns/${id}`, data).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['returns'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
+}
 
 // ── Payments ──────────────────────────────────────────────────────────────────
 export function usePayments(filters: Record<string, string> = {}) {
@@ -103,6 +124,10 @@ export function useVoidPayment() {
   const qc = useQueryClient();
   return useMutation({ mutationFn: (id: number) => api.delete(`/payments/${id}`).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['payments'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
 }
+export function useUpdatePayment() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: ({ id, ...data }: { id: number } & object) => api.put(`/payments/${id}`, data).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['payments'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
+}
 
 // ── Expenses ──────────────────────────────────────────────────────────────────
 export function useExpenses(filters: Record<string, string> = {}) {
@@ -115,6 +140,10 @@ export function useCreateExpense() {
 export function useVoidExpense() {
   const qc = useQueryClient();
   return useMutation({ mutationFn: (id: number) => api.delete(`/expenses/${id}`).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['expenses'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
+}
+export function useUpdateExpense() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: ({ id, ...data }: { id: number } & object) => api.put(`/expenses/${id}`, data).then((r) => r.data), onSuccess: () => { qc.invalidateQueries({ queryKey: ['expenses'] }); qc.invalidateQueries({ queryKey: ['reports'] }); } });
 }
 export function useExpenseCategories() {
   return useQuery({ queryKey: ['expense-categories'], queryFn: () => api.get('/expenses/categories').then((r) => r.data) });

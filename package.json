@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "postinstall": "prisma generate --schema=backend/prisma/schema.prisma",
-    "vercel-build": "npm install && cd frontend && npm install && npm run build"
+    "db:sync": "prisma db push --schema=backend/prisma/schema.prisma --skip-generate",
+    "vercel-build": "(npm run db:sync || echo 'WARN: prisma db push failed - check DATABASE_URL env var in Vercel') && cd frontend && npm install && npm run build"
   },
   "dependencies": {
     "@prisma/client": "^5.10.0",
