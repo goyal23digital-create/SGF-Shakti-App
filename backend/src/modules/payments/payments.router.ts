@@ -39,6 +39,39 @@ paymentsRouter.post('/', async (req: AuthRequest, res) => {
   res.status(201).json(row);
 });
 
+paymentsRouter.put('/:id', async (req: AuthRequest, res) => {
+  const id = Number(req.params.id);
+  const existing = await prisma.partyPayment.findUnique({ where: { id } });
+  if (!existing) throw new AppError(404, 'Record not found');
+  if (existing.isVoided) throw new AppError(400, 'Record is voided');
+
+  const { date, partyId, amount, paymentMode, remarks, fyYear } = req.body;
+  if (amount != null && Number(amount) < 0) throw new AppError(400, 'amount must be non-negative');
+
+  if (partyId) {
+    const party = await prisma.party.findUnique({ where: { id: Number(partyId) } });
+    if (!party) throw new AppError(404, 'Party not found');
+  }
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const r = await tx.partyPayment.update({
+      where: { id },
+      data: {
+        ...(date ? { date: new Date(date) } : {}),
+        ...(partyId ? { partyId: Number(partyId) } : {}),
+        ...(amount != null ? { amount } : {}),
+        ...(paymentMode ? { paymentMode } : {}),
+        ...(remarks !== undefined ? { remarks } : {}),
+        ...(fyYear ? { fyYear } : {}),
+      },
+      include: { party: { select: { name: true, city: true } } },
+    });
+    await logAudit(tx, req.userId!, 'UPDATE', 'party_payments', id, existing as any, r as any);
+    return r;
+  });
+  res.json(updated);
+});
+
 paymentsRouter.delete('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
   const id = Number(req.params.id);
   const existing = await prisma.partyPayment.findUnique({ where: { id } });

@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
+import { useSettings } from '../api/hooks';
+import { Logo } from '../components/Logo';
 
 export function LoginPage() {
+  const { data: settings } = useSettings();
   const [email, setEmail] = useState('admin@sgf.com');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -29,11 +32,15 @@ export function LoginPage() {
       <div className="w-full max-w-sm px-4">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
-            SGF
+          <div className="flex justify-center mb-4">
+            <Logo logoDataUri={settings?.logoDataUri} size={72} />
           </div>
-          <h1 className="text-2xl font-bold text-white">Shakti Gold Furniture</h1>
-          <p className="text-white/50 text-sm mt-1">Steel & Furniture ERP · 2026-27</p>
+          <h1 className="text-2xl font-bold text-white">
+            {settings?.companyName || 'Shakti Gold Furniture'}
+          </h1>
+          <p className="text-white/50 text-sm mt-1">
+            {settings?.tagline || 'Steel & Furniture ERP · 2026-27'}
+          </p>
         </div>
 
         {/* Card */}

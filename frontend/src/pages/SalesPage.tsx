@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useSales, useCreateSale, useVoidSale, useItems, useParties } from '../api/hooks';
+import { useState, useEffect, useRef } from 'react';
+import { useSales, useCreateSale, useUpdateSale, useVoidSale, useItems, useParties, useSettings } from '../api/hooks';
 import { FySelector } from '../components/FySelector';
 import { api } from '../api/client';
 
@@ -17,12 +17,32 @@ export function SalesPage() {
   const { data: items = [] } = useItems();
   const { data: parties = [] } = useParties();
   const create = useCreateSale();
+  const update = useUpdateSale();
   const voidSale = useVoidSale();
+  const { data: settings } = useSettings();
   const [form, setForm] = useState(EMPTY);
   const [error, setError] = useState('');
+  const [editId, setEditId] = useState<number | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const skipRateFill = useRef(false);
+  const seededDefaults = useRef(false);
+
+  useEffect(() => {
+    if (seededDefaults.current || !settings || editId !== null) return;
+    seededDefaults.current = true;
+    setForm((f) => {
+      if (f.quantity !== '' || f.unitPrice !== '' || f.partyId !== '' || f.itemId !== '' || f.remarks !== '') return f;
+      return {
+        ...f,
+        taxPercent: settings.defaultTaxPercent != null ? String(settings.defaultTaxPercent) : f.taxPercent,
+        gstType: settings.defaultGstType ?? f.gstType,
+      };
+    });
+  }, [settings, editId]);
 
   useEffect(() => {
     if (!form.partyId || !form.itemId) return;
+    if (skipRateFill.current) { skipRateFill.current = false; return; }
     api.get(`/parties/${form.partyId}/rate/${form.itemId}`).then((r) => {
       if (r.data.rate != null) setForm((f) => ({ ...f, unitPrice: String(r.data.rate) }));
     }).catch(() => {});
@@ -37,12 +57,46 @@ export function SalesPage() {
   const taxAmount = baseValue * taxPct / 100;
   const grandTotal = baseValue + taxAmount;
 
+  function startEdit(r: any) {
+    setError('');
+    const partyId = String(r.partyId ?? r.party?.id ?? '');
+    const itemId = String(r.itemId ?? r.item?.id ?? '');
+    if (partyId !== form.partyId || itemId !== form.itemId) skipRateFill.current = true;
+    setForm({
+      date: r.date?.slice(0, 10) ?? today(),
+      itemId,
+      partyId,
+      quantity: String(parseFloat(r.quantity ?? 0) || 0),
+      unitPrice: String(parseFloat(r.unitPrice ?? 0) || 0),
+      discountAmount: String(parseFloat(r.discountAmount ?? 0) || 0),
+      carriageAmount: String(parseFloat(r.carriageAmount ?? 0) || 0),
+      taxPercent: String(parseFloat(r.taxPercent ?? 0) || 0),
+      gstType: r.gstType ?? 'IGST',
+      remarks: r.remarks ?? '',
+    });
+    setEditId(r.id);
+    formRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function cancelEdit() {
+    setEditId(null);
+    setForm({ ...EMPTY, date: today() });
+    setError('');
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
-    create.mutateAsync({ ...form, fyYear: fy, carriageAmount: carriage, taxPercent: taxPct, discountAmount: discount })
-      .then(() => setForm((f) => ({ ...f, quantity: '', discountAmount: '0', carriageAmount: '0', remarks: '' })))
-      .catch((e: any) => setError(e.response?.data?.error ?? 'Error'));
+    const payload = { ...form, fyYear: fy, carriageAmount: carriage, taxPercent: taxPct, discountAmount: discount };
+    if (editId !== null) {
+      update.mutateAsync({ id: editId, ...payload })
+        .then(() => { setEditId(null); setForm({ ...EMPTY, date: today() }); })
+        .catch((e: any) => setError(e.response?.data?.error ?? 'Error'));
+    } else {
+      create.mutateAsync(payload)
+        .then(() => setForm((f) => ({ ...f, quantity: '', discountAmount: '0', carriageAmount: '0', remarks: '' })))
+        .catch((e: any) => setError(e.response?.data?.error ?? 'Error'));
+    }
   }
 
   const totalGrand = rows.reduce((s: number, r: any) => s + parseFloat(r.grandTotal ?? r.value ?? 0), 0);
@@ -59,7 +113,13 @@ export function SalesPage() {
 
       <div className="card">
         <h2 className="text-sm font-semibold text-gray-700 mb-4">New Sale Entry</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} ref={formRef}>
+          {editId !== null && (
+            <div className="flex items-center gap-3 mb-4 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm font-medium">
+              <span>✏️ Editing entry #{editId} — saving will overwrite it</span>
+              <button type="button" className="btn-secondary" onClick={cancelEdit}>Cancel</button>
+            </div>
+          )}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             <div className="form-field">
               <label className="label">Date</label>
@@ -128,7 +188,9 @@ export function SalesPage() {
               <label className="label">Remarks</label>
               <input type="text" className="input" value={form.remarks} onChange={(e) => setForm({ ...form, remarks: e.target.value })} placeholder="Optional" />
             </div>
-            <button type="submit" className="btn-primary" disabled={create.isPending}>{create.isPending ? 'Saving…' : 'Add Sale'}</button>
+            <button type="submit" className="btn-primary" disabled={create.isPending || update.isPending}>
+              {editId !== null ? (update.isPending ? 'Updating…' : 'Update') : (create.isPending ? 'Saving…' : 'Add Sale')}
+            </button>
           </div>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </form>
@@ -161,7 +223,10 @@ export function SalesPage() {
                     <td><span className="badge badge-purple">{r.gstType} {parseFloat(r.taxPercent || 0).toFixed(0)}%</span></td>
                     <td className="text-right font-mono font-semibold text-indigo-700">₹{fmt(r.grandTotal)}</td>
                     <td className="text-gray-400 text-xs">{r.remarks}</td>
-                    <td><button onClick={() => { if (confirm('Void this sale?')) voidSale.mutate(r.id); }} className="btn-danger">Void</button></td>
+                    <td className="whitespace-nowrap">
+                      <button onClick={() => startEdit(r)} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium mr-2">Edit</button>
+                      <button onClick={() => { if (confirm('Void this sale?')) voidSale.mutate(r.id); }} className="btn-danger">Void</button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

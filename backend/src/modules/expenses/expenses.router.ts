@@ -51,6 +51,40 @@ expensesRouter.post('/', async (req: AuthRequest, res) => {
   res.status(201).json(row);
 });
 
+expensesRouter.put('/:id', async (req: AuthRequest, res) => {
+  const id = Number(req.params.id);
+  const existing = await prisma.expense.findUnique({ where: { id } });
+  if (!existing) throw new AppError(404, 'Record not found');
+  if (existing.isVoided) throw new AppError(400, 'Record is voided');
+
+  const { date, payee, categoryId, amount, paymentMode, remarks, fyYear } = req.body;
+  if (amount != null && Number(amount) < 0) throw new AppError(400, 'amount must be non-negative');
+
+  if (categoryId != null) {
+    const cat = await prisma.expenseCategory.findUnique({ where: { id: Number(categoryId) } });
+    if (!cat) throw new AppError(404, 'Category not found');
+  }
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const r = await tx.expense.update({
+      where: { id },
+      data: {
+        ...(date ? { date: new Date(date) } : {}),
+        ...(payee ? { payee } : {}),
+        ...(categoryId !== undefined ? { categoryId: categoryId === null ? null : Number(categoryId) } : {}),
+        ...(amount != null ? { amount } : {}),
+        ...(paymentMode ? { paymentMode } : {}),
+        ...(remarks !== undefined ? { remarks } : {}),
+        ...(fyYear ? { fyYear } : {}),
+      },
+      include: { category: true },
+    });
+    await logAudit(tx, req.userId!, 'UPDATE', 'expenses', id, existing as any, r as any);
+    return r;
+  });
+  res.json(updated);
+});
+
 expensesRouter.delete('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
   const id = Number(req.params.id);
   const existing = await prisma.expense.findUnique({ where: { id } });

@@ -64,6 +64,53 @@ returnsRouter.post('/', async (req: AuthRequest, res) => {
   res.status(201).json({ ...row, ...computeTotals(row) });
 });
 
+returnsRouter.put('/:id', async (req: AuthRequest, res) => {
+  const id = Number(req.params.id);
+  const existing = await prisma.saleReturn.findUnique({ where: { id } });
+  if (!existing) throw new AppError(404, 'Record not found');
+  if (existing.isVoided) throw new AppError(400, 'Record is voided');
+
+  const { date, itemId, quantity, unitPrice, partyId, remarks, fyYear,
+    carriageAmount, taxPercent, discountAmount, gstType } = req.body;
+  if (quantity != null && Number(quantity) < 0) throw new AppError(400, 'quantity must be non-negative');
+  if (unitPrice != null && Number(unitPrice) < 0) throw new AppError(400, 'unitPrice must be non-negative');
+
+  if (itemId) {
+    const item = await prisma.item.findUnique({ where: { id: Number(itemId) } });
+    if (!item) throw new AppError(404, 'Item not found');
+  }
+  if (partyId) {
+    const party = await prisma.party.findUnique({ where: { id: Number(partyId) } });
+    if (!party) throw new AppError(404, 'Party not found');
+  }
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const r = await tx.saleReturn.update({
+      where: { id },
+      data: {
+        ...(date ? { date: new Date(date) } : {}),
+        ...(itemId ? { itemId: Number(itemId) } : {}),
+        ...(quantity != null ? { quantity } : {}),
+        ...(unitPrice != null ? { unitPrice } : {}),
+        ...(carriageAmount != null ? { carriageAmount } : {}),
+        ...(taxPercent != null ? { taxPercent } : {}),
+        ...(discountAmount != null ? { discountAmount } : {}),
+        ...(gstType !== undefined ? { gstType } : {}),
+        ...(partyId ? { partyId: Number(partyId) } : {}),
+        ...(remarks !== undefined ? { remarks } : {}),
+        ...(fyYear ? { fyYear } : {}),
+      },
+      include: {
+        item: { select: { code: true, name: true } },
+        party: { select: { name: true, city: true } },
+      },
+    });
+    await logAudit(tx, req.userId!, 'UPDATE', 'sale_returns', id, existing as any, r as any);
+    return r;
+  });
+  res.json({ ...updated, ...computeTotals(updated) });
+});
+
 returnsRouter.delete('/:id', requireRole('ADMIN', 'MANAGER'), async (req: AuthRequest, res) => {
   const id = Number(req.params.id);
   const existing = await prisma.saleReturn.findUnique({ where: { id } });

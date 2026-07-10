@@ -11,11 +11,14 @@ import { returnsRouter } from './modules/returns/returns.router';
 import { paymentsRouter } from './modules/payments/payments.router';
 import { expensesRouter } from './modules/expenses/expenses.router';
 import { reportsRouter } from './modules/reports/reports.router';
+import { settingsRouter } from './modules/settings/settings.router';
+import { bootstrapMiddleware } from './common/bootstrap';
 
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '4mb' }));
+app.use(bootstrapMiddleware);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
@@ -28,6 +31,7 @@ app.use('/api/returns', returnsRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/expenses', expensesRouter);
 app.use('/api/reports', reportsRouter);
+app.use('/api/settings', settingsRouter);
 
 app.use(errorHandler);
 

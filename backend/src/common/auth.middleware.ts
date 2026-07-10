@@ -14,7 +14,7 @@ export function authenticate(req: AuthRequest, _res: Response, next: NextFunctio
   if (!header?.startsWith('Bearer ')) throw new AppError(401, 'Unauthorized');
   const token = header.slice(7);
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as { sub: number; role: string };
+    const payload = jwt.verify(token, JWT_SECRET) as unknown as { sub: number; role: string };
     req.userId = payload.sub;
     req.userRole = payload.role;
     next();

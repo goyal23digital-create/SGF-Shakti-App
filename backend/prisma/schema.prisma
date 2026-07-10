@@ -214,6 +214,28 @@ model Expense {
   @@map("expenses")
 }
 
+// ── Settings ──────────────────────────────────────────────────────────────────
+
+model CompanySettings {
+  id                Int      @id @default(1)
+  companyName       String   @default("Shakti Gold Furniture")
+  tagline           String?
+  logoDataUri       String?  @db.Text
+  gstin             String?
+  stateCode         String?
+  address           String?
+  phone             String?
+  email             String?
+  defaultTaxPercent Decimal  @default(18) @db.Decimal(5, 2)
+  defaultGstType    String   @default("IGST")
+  accentColor       String   @default("#4f46e5")
+  lowStockThreshold Int      @default(10)
+  invoicePrefix     String   @default("SGF")
+  updatedAt         DateTime @updatedAt
+
+  @@map("company_settings")
+}
+
 // ── Auth & Audit ──────────────────────────────────────────────────────────────
 
 enum UserRole {

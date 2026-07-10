@@ -78,10 +78,23 @@ salesRouter.post('/', async (req: AuthRequest, res) => {
 salesRouter.put('/:id', async (req: AuthRequest, res) => {
   const id = Number(req.params.id);
   const existing = await prisma.sale.findUnique({ where: { id } });
-  if (!existing || existing.isVoided) throw new AppError(404, 'Record not found');
+  if (!existing) throw new AppError(404, 'Record not found');
+  if (existing.isVoided) throw new AppError(400, 'Record is voided');
 
-  const { date, itemId, quantity, unitPrice, partyId, remarks,
+  const { date, itemId, quantity, unitPrice, partyId, remarks, fyYear,
     carriageAmount, taxPercent, discountAmount, gstType } = req.body;
+  if (quantity != null && Number(quantity) < 0) throw new AppError(400, 'quantity must be non-negative');
+  if (unitPrice != null && Number(unitPrice) < 0) throw new AppError(400, 'unitPrice must be non-negative');
+
+  if (itemId) {
+    const item = await prisma.item.findUnique({ where: { id: Number(itemId) } });
+    if (!item) throw new AppError(404, 'Item not found');
+  }
+  if (partyId) {
+    const party = await prisma.party.findUnique({ where: { id: Number(partyId) } });
+    if (!party) throw new AppError(404, 'Party not found');
+  }
+
   const updated = await prisma.$transaction(async (tx) => {
     const r = await tx.sale.update({
       where: { id },
@@ -96,6 +109,11 @@ salesRouter.put('/:id', async (req: AuthRequest, res) => {
         ...(gstType !== undefined ? { gstType } : {}),
         ...(partyId ? { partyId: Number(partyId) } : {}),
         ...(remarks !== undefined ? { remarks } : {}),
+        ...(fyYear ? { fyYear } : {}),
+      },
+      include: {
+        item: { select: { code: true, name: true } },
+        party: { select: { name: true, city: true } },
       },
     });
     await logAudit(tx, req.userId!, 'UPDATE', 'sales', id, existing as any, r as any);

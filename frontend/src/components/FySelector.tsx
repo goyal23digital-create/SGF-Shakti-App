@@ -10,8 +10,9 @@ export function FySelector({ value, onChange }: Props) {
           key={fy}
           onClick={() => onChange(fy)}
           className={`px-3 py-1 rounded-md text-xs font-semibold transition-colors ${
-            value === fy ? 'bg-indigo-600 text-white' : 'text-gray-500 hover:text-gray-800'
+            value === fy ? 'text-white' : 'text-gray-500 hover:text-gray-800'
           }`}
+          style={value === fy ? { background: 'var(--accent)' } : undefined}
         >
           {fy}
         </button>

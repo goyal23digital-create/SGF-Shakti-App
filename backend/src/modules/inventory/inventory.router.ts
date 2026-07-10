@@ -51,9 +51,17 @@ inventoryRouter.post('/', async (req: AuthRequest, res) => {
 inventoryRouter.put('/:id', async (req: AuthRequest, res) => {
   const id = Number(req.params.id);
   const existing = await prisma.inventoryIn.findUnique({ where: { id } });
-  if (!existing || existing.isVoided) throw new AppError(404, 'Record not found');
+  if (!existing) throw new AppError(404, 'Record not found');
+  if (existing.isVoided) throw new AppError(400, 'Record is voided');
 
-  const { date, itemId, quantity, type, remarks } = req.body;
+  const { date, itemId, quantity, type, remarks, fyYear } = req.body;
+  if (quantity != null && Number(quantity) < 0) throw new AppError(400, 'quantity must be non-negative');
+
+  if (itemId) {
+    const item = await prisma.item.findUnique({ where: { id: Number(itemId) } });
+    if (!item) throw new AppError(404, 'Item not found');
+  }
+
   const updated = await prisma.$transaction(async (tx) => {
     const r = await tx.inventoryIn.update({
       where: { id },
@@ -63,7 +71,9 @@ inventoryRouter.put('/:id', async (req: AuthRequest, res) => {
         ...(quantity != null ? { quantity } : {}),
         ...(type ? { type } : {}),
         ...(remarks !== undefined ? { remarks } : {}),
+        ...(fyYear ? { fyYear } : {}),
       },
+      include: { item: { select: { code: true, name: true } } },
     });
     await logAudit(tx, req.userId!, 'UPDATE', 'inventory_in', id, existing as any, r as any);
     return r;

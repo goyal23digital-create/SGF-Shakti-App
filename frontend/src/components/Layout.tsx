@@ -1,4 +1,7 @@
+import { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useSettings } from '../api/hooks';
+import { Logo } from './Logo';
 
 const NAV = [
   { to: '/dashboard', icon: '📊', label: 'Dashboard' },
@@ -10,10 +13,17 @@ const NAV = [
   { to: '/parties', icon: '👥', label: 'Parties' },
   { to: '/items', icon: '📋', label: 'Items' },
   { to: '/reports', icon: '📈', label: 'Reports' },
+  { to: '/settings', icon: '⚙️', label: 'Settings' },
 ];
 
 export function Layout() {
   const navigate = useNavigate();
+  const { data: settings } = useSettings();
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--accent', settings?.accentColor || '#4f46e5');
+  }, [settings?.accentColor]);
+
   function logout() { localStorage.removeItem('token'); navigate('/login'); }
 
   return (
@@ -22,12 +32,14 @@ export function Layout() {
         {/* Logo */}
         <div className="px-4 py-5 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-              SGF
-            </div>
-            <div>
-              <div className="text-white font-semibold text-sm leading-tight">Shakti Gold</div>
-              <div className="text-white/40 text-xs">Furniture ERP</div>
+            <Logo logoDataUri={settings?.logoDataUri} size={36} />
+            <div className="min-w-0">
+              <div className="text-white font-semibold text-sm leading-tight truncate">
+                {settings?.companyName || 'Shakti Gold Furniture'}
+              </div>
+              {settings?.tagline && (
+                <div className="text-white/40 text-xs truncate">{settings.tagline}</div>
+              )}
             </div>
           </div>
         </div>
@@ -41,10 +53,11 @@ export function Layout() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2 rounded-lg text-sm mb-0.5 transition-colors ${
                   isActive
-                    ? 'bg-indigo-600 text-white font-medium'
+                    ? 'text-white font-medium'
                     : 'text-white/60 hover:bg-white/10 hover:text-white'
                 }`
               }
+              style={({ isActive }) => (isActive ? { background: 'var(--accent)' } : undefined)}
             >
               <span className="text-base leading-none">{icon}</span>
               <span>{label}</span>
